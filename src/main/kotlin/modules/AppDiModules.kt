@@ -2,9 +2,14 @@ package com.concatstudio.onegym.modules
 
 import com.concatstudio.onegym.data.*
 import com.concatstudio.onegym.respository.*
+import com.concatstudio.onegym.security.JwtService
+import com.concatstudio.onegym.security.JwtSettings
 import org.koin.dsl.module
 
 val appDiModules = module {
+    single { JwtSettings.load() }
+    single { JwtService(get()) }
+    single<RefreshTokenRepository> { RefreshTokenRepositoryImp() }
     single<UserRepository> { UserRepositoryImp() }
     single<GymRepository> { GymRepositoryImp() }
     single<UserRoleRepository> { UserRoleRepositoryImp() }

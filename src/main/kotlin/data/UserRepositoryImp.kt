@@ -1,11 +1,13 @@
 package com.concatstudio.onegym.data
 
 import com.concatstudio.onegym.dao.UserDao
+import com.concatstudio.onegym.dao.Users
 import com.concatstudio.onegym.database.Database
 import com.concatstudio.onegym.model.User
 import com.concatstudio.onegym.respository.UserRepository
 import com.concatstudio.onegym.security.PasswordService
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
+import org.jetbrains.exposed.v1.core.*
 import com.concatstudio.onegym.mappers.toModel
 
 class UserRepositoryImp : UserRepository {
@@ -18,6 +20,12 @@ class UserRepositoryImp : UserRepository {
     override fun getUserById(id: Long): User? {
         return transaction(Database.connection) {
             UserDao.findById(id)?.let(::toModel)
+        }
+    }
+
+    override fun getUserByEmail(email: String): User? {
+        return transaction(Database.connection) {
+            UserDao.find { Users.email eq email }.firstOrNull()?.let(::toModel)
         }
     }
 

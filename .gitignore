@@ -1,0 +1,32 @@
+# Gradle / Kotlin build output
+.gradle/
+build/
+out/
+*.class
+
+# Keep the Gradle wrapper, but not downloaded distributions or build artifacts.
+!gradle/wrapper/gradle-wrapper.jar
+
+# IntelliJ IDEA / Android Studio local settings
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Editor and operating-system files
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Logs and temporary files
+*.log
+*.tmp
+*.swp
+
+# Local secrets and deployment-specific overrides
+.env
+.env.*
+!.env.example
+src/main/resources/application.local.conf
+*.jks
+*.keystore

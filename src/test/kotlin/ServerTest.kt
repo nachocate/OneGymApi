@@ -7,6 +7,11 @@ import kotlin.test.*
 
 class ServerTest {
 
+    init {
+        System.setProperty("JWT_SECRET", "test-access-secret-that-is-at-least-32-characters")
+        System.setProperty("JWT_REFRESH_TOKEN_HASH_SECRET", "test-refresh-secret-that-is-at-least-32-characters")
+    }
+
     @Test
     fun `test root endpoint`() = testApplication {
         application {

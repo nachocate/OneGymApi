@@ -2,6 +2,7 @@ package com.concatstudio.onegym
 
 import com.concatstudio.onegym.routes.*
 import io.ktor.server.application.*
+import io.ktor.server.auth.authenticate
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import org.koin.logger.SLF4JLogger
@@ -15,23 +16,25 @@ fun Application.configureRouting() {
         get("/json/kotlinx-serialization") {
             call.respond(mapOf("hello" to "world"))
         }
-        userRouting()
         authenticationRouting()
-        gymRouting()
-        userRoleRouting()
-        userGymRouting()
-        newsRouting()
-        planTypeRouting()
-        planRouting()
-        weekRouting()
-        dayRouting()
-        exerciseRouting()
-        quantityTypeRouting()
-        blockRouting()
-        blockExerciseRouting()
-        userPlanRouting()
-        currentPlanActivityRouting()
-        registerRouting()
-        userTestRouting()
+        authenticate("auth-jwt") {
+            userRouting()
+            gymRouting()
+            userRoleRouting()
+            userGymRouting()
+            newsRouting()
+            planTypeRouting()
+            planRouting()
+            weekRouting()
+            dayRouting()
+            exerciseRouting()
+            quantityTypeRouting()
+            blockRouting()
+            blockExerciseRouting()
+            userPlanRouting()
+            currentPlanActivityRouting()
+            registerRouting()
+            userTestRouting()
+        }
     }
 }

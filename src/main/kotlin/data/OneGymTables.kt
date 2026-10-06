@@ -27,6 +27,15 @@ object UserGyms : LongIdTable("user_gyms") {
     val endDate = date("end_date").nullable()
 }
 
+object UserRefreshTokens : LongIdTable("user_refresh_tokens") {
+    val user = reference("user_id", Users)
+    val tokenHash = varchar("token_hash", 64).uniqueIndex()
+    val deviceInfo = varchar("device_info", 100).nullable()
+    val expiresAt = timestampWithTimeZone("expires_at")
+    val isRevoked = bool("is_revoked").default(false)
+    val createdAt = timestampWithTimeZone("created_at")
+}
+
 object News : LongIdTable("news") {
     val gym = reference("id_gym", Gyms)
     val title = varchar("title", 255)

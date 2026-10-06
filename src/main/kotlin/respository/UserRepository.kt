@@ -5,6 +5,7 @@ import com.concatstudio.onegym.model.User
 interface UserRepository {
     fun getUsers(): List<User>
     fun getUserById(id: Long): User?
+    fun getUserByEmail(email: String): User?
     fun updateUser(userId:Long,user: User)
     fun createUser(user: User)
     fun deleteUserById(id: Long)
