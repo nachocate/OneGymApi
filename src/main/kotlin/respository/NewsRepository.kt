@@ -4,6 +4,7 @@ import com.concatstudio.onegym.model.News
 
 interface NewsRepository {
     fun getNews(): List<News>
+    fun getNewsByGymId(gymId: Long): List<News>
     fun getNewsById(id: Long): News?
     fun updateNews(newsId: Long, news: News)
     fun createNews(news: News)

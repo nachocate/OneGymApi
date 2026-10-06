@@ -77,6 +77,37 @@ and `POST /auth/logout` with the refresh token to revoke that session. The TTLs
 can be changed through `JWT_ACCESS_TOKEN_TTL_MINUTES` and
 `JWT_REFRESH_TOKEN_TTL_DAYS`.
 
+`GET /status` requires the access token and returns the current user's active
+gym subscriptions, the role held in each gym, its basic details, and `gymCount`.
+
+`GET /{gymId}/news` requires an active subscription to that gym and returns its
+news ordered from newest to oldest.
+
+`GET /{gymId}/home` requires an active subscription and returns the gym plus
+its active coaches. Coaches are assigned through `gym_coaches`, independently
+from the user's membership role, and include their `coachType` and assignment
+dates.
+
 For an existing database, run
 `src/main/resources/migrations/V2__create_user_refresh_tokens.sql` once before
 deploying. The API does not currently include a migration runner.
+
+Then run `migrations/V4__add_user_contact_and_gym_coaches.sql` to add the
+`phone` and `address` user fields plus the `coach_types` and `gym_coaches`
+tables. Fresh databases receive these definitions directly from
+`onegym_schema.sql`.
+
+Run `migrations/V5__add_news_image_url.sql` to add the optional `image_url`
+field to existing news without changing any current records.
+
+## Resetting a local database
+
+`src/main/resources/reset_onegym_schema.sql` permanently removes only the
+OneGym tables and their data. Run it manually against the intended local
+database, then execute `onegym_schema.sql` to recreate the schema and seed
+quantity types.
+
+The test users in `seed_test_data.sql` use `password` as their password. If
+you seeded the database before the BCrypt correction, run
+`migrations/V3__fix_seeded_test_user_passwords.sql` once to update only the
+four `@onegym.test` users.

@@ -11,5 +11,6 @@ class NewsDao(id: EntityID<Long>) : LongEntity(id) {
     var gymId by News.gym
     var title by News.title
     var description by News.description
+    var imageUrl by News.imageUrl
     var date: OffsetDateTime by News.date
 }

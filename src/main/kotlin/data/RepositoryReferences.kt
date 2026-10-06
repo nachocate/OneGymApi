@@ -5,6 +5,7 @@ import com.concatstudio.onegym.dao.*
 internal fun userRef(id: Long) = UserDao.findById(id)!!.id
 internal fun gymRef(id: Long) = GymDao.findById(id)!!.id
 internal fun roleRef(id: Long) = UserRoleDao.findById(id)!!.id
+internal fun coachTypeRef(id: Long) = CoachTypeDao.findById(id)!!.id
 internal fun planTypeRef(id: Long) = PlanTypeDao.findById(id)!!.id
 internal fun planRef(id: Long) = PlanDao.findById(id)!!.id
 internal fun weekRef(id: Long) = WeekDao.findById(id)!!.id

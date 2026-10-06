@@ -8,14 +8,18 @@ fun toModel(user: UserDao) = User(
     firstName = user.firstName,
     lastName = user.lastName,
     email = user.email,
-    password = user.password
+    password = user.password,
+    phone = user.phone,
+    address = user.address
 )
 
 fun User.toResponse() = UserResponse(
     id = id,
     firstName = firstName,
     lastName = lastName,
-    email = email
+    email = email,
+    phone = phone,
+    address = address
 )
 
 fun toModel(gym: GymDao) = Gym(
@@ -40,12 +44,22 @@ fun toModel(userGym: UserGymDao) = UserGym(
     endDate = userGym.endDate?.toString()
 )
 
+fun toModel(gymCoach: GymCoachDao) = GymCoach(
+    id = gymCoach.id.value,
+    userId = gymCoach.userId.value,
+    gymId = gymCoach.gymId.value,
+    coachTypeId = gymCoach.coachTypeId.value,
+    startDate = gymCoach.startDate.toString(),
+    endDate = gymCoach.endDate?.toString()
+)
+
 fun toModel(news: NewsDao) = News(
     id = news.id.value,
     gymId = news.gymId.value,
     title = news.title,
     description = news.description,
-    date = news.date.toString()
+    date = news.date.toString(),
+    imageUrl = news.imageUrl
 )
 
 fun toModel(planType: PlanTypeDao) = PlanType(planType.id.value, planType.name)

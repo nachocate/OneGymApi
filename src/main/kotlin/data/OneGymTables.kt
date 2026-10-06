@@ -19,10 +19,22 @@ object UserRoles : LongIdTable("user_roles") {
     val name = varchar("name", 100).uniqueIndex()
 }
 
+object CoachTypes : LongIdTable("coach_types") {
+    val name = varchar("name", 100).uniqueIndex()
+}
+
 object UserGyms : LongIdTable("user_gyms") {
     val user = reference("id_user", Users)
     val gym = reference("id_gym", Gyms)
     val role = reference("id_user_rol", UserRoles)
+    val startDate = date("start_date")
+    val endDate = date("end_date").nullable()
+}
+
+object GymCoaches : LongIdTable("gym_coaches") {
+    val user = reference("id_user", Users)
+    val gym = reference("id_gym", Gyms)
+    val coachType = reference("id_coach_type", CoachTypes)
     val startDate = date("start_date")
     val endDate = date("end_date").nullable()
 }
@@ -40,6 +52,7 @@ object News : LongIdTable("news") {
     val gym = reference("id_gym", Gyms)
     val title = varchar("title", 255)
     val description = text("description")
+    val imageUrl = text("image_url").nullable()
     val date = timestampWithTimeZone("date")
 }
 

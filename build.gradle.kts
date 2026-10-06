@@ -28,6 +28,7 @@ dependencies {
     implementation(libs.exposed.jdbc)
     implementation(libs.exposed.java.time)
     implementation(libs.spring.security.crypto)
+    implementation(libs.spring.core)
     implementation("com.zaxxer:HikariCP:7.0.2")
     runtimeOnly("org.postgresql:postgresql:42.7.8")
 

@@ -10,6 +10,10 @@ val appDiModules = module {
     single { JwtSettings.load() }
     single { JwtService(get()) }
     single<RefreshTokenRepository> { RefreshTokenRepositoryImp() }
+    single<UserStatusRepository> { UserStatusRepositoryImp() }
+    single<GymHomeRepository> { GymHomeRepositoryImp() }
+    single<CoachTypeRepository> { CoachTypeRepositoryImp() }
+    single<GymCoachRepository> { GymCoachRepositoryImp() }
     single<UserRepository> { UserRepositoryImp() }
     single<GymRepository> { GymRepositoryImp() }
     single<UserRoleRepository> { UserRoleRepositoryImp() }

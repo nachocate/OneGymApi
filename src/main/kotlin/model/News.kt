@@ -8,5 +8,6 @@ data class News(
     val gymId: Long,
     val title: String,
     val description: String,
-    val date: String
+    val date: String,
+    val imageUrl: String? = null
 )

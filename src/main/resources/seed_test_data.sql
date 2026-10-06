@@ -15,16 +15,25 @@ INSERT INTO user_roles (id, name) OVERRIDING SYSTEM VALUE VALUES
     (3, 'SuperAdmin');
 
 -- ============================================================
+-- COACH TYPES
+-- ============================================================
+
+INSERT INTO coach_types (id, name) OVERRIDING SYSTEM VALUE VALUES
+    (1, 'headCoach'),
+    (2, 'coach'),
+    (3, 'assistant');
+
+-- ============================================================
 -- USERS
 -- BCrypt hash of: password
 -- ============================================================
 
-INSERT INTO users (id, email, password, avatar_url, firstname, lastname)
+INSERT INTO users (id, email, password, avatar_url, firstname, lastname, phone, address)
 OVERRIDING SYSTEM VALUE VALUES
-    (1, 'sofia@onegym.test', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', NULL, 'Sofia', 'Martinez'),
-    (2, 'lucas@onegym.test', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', NULL, 'Lucas', 'Fernandez'),
-    (3, 'valentina@onegym.test', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', NULL, 'Valentina', 'Gomez'),
-    (4, 'admin@onegym.test', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', NULL, 'Martin', 'Administrador');
+    (1, 'sofia@onegym.test', '$2a$12$lRjI71wrqakSjaVFLQZSZ.xmq2.wn6LbBGQgJWSGndpobIG0ygwl6', NULL, 'Sofia', 'Martinez', '+54 11 5555-0101', 'Av. Siempre Viva 123'),
+    (2, 'lucas@onegym.test', '$2a$12$lRjI71wrqakSjaVFLQZSZ.xmq2.wn6LbBGQgJWSGndpobIG0ygwl6', NULL, 'Lucas', 'Fernandez', '+54 11 5555-0102', 'Av. Siempre Viva 124'),
+    (3, 'valentina@onegym.test', '$2a$12$lRjI71wrqakSjaVFLQZSZ.xmq2.wn6LbBGQgJWSGndpobIG0ygwl6', NULL, 'Valentina', 'Gomez', '+54 11 5555-0103', 'Av. Siempre Viva 125'),
+    (4, 'admin@onegym.test', '$2a$12$lRjI71wrqakSjaVFLQZSZ.xmq2.wn6LbBGQgJWSGndpobIG0ygwl6', NULL, 'Martin', 'Administrador', '+54 11 5555-0104', 'Av. Siempre Viva 126');
 
 -- ============================================================
 -- GYM
@@ -41,17 +50,22 @@ OVERRIDING SYSTEM VALUE VALUES
     (3, 3, 1, 1, CURRENT_DATE - 45, NULL),
     (4, 4, 1, 3, CURRENT_DATE - 365, NULL);
 
+INSERT INTO gym_coaches (id, id_user, id_gym, id_coach_type, start_date, end_date)
+OVERRIDING SYSTEM VALUE VALUES
+    (1, 2, 1, 1, CURRENT_DATE - 180, NULL),
+    (2, 3, 1, 2, CURRENT_DATE - 120, NULL);
+
 -- ============================================================
 -- NEWS
 -- ============================================================
 
-INSERT INTO news (id, id_gym, title, description, "date")
+INSERT INTO news (id, id_gym, title, description, image_url, "date")
 OVERRIDING SYSTEM VALUE VALUES
-    (1, 1, 'Nueva zona de peso libre', 'Incorporamos nuevas barras, discos y mancuernas para tus entrenamientos.', CURRENT_TIMESTAMP - INTERVAL '12 days'),
-    (2, 1, 'Clase especial de movilidad', 'El próximo sábado habrá una clase abierta de movilidad y recuperación.', CURRENT_TIMESTAMP - INTERVAL '9 days'),
-    (3, 1, 'Desafío Forze de agosto', 'Participá del desafío mensual y registrá tus mejores marcas.', CURRENT_TIMESTAMP - INTERVAL '6 days'),
-    (4, 1, 'Nuevos horarios de funcional', 'Agregamos turnos de entrenamiento funcional por la mañana.', CURRENT_TIMESTAMP - INTERVAL '3 days'),
-    (5, 1, 'Mantenimiento de vestuarios', 'Los vestuarios permanecerán cerrados el domingo de 08:00 a 12:00.', CURRENT_TIMESTAMP - INTERVAL '1 day');
+    (1, 1, 'Nueva zona de peso libre', 'Incorporamos nuevas barras, discos y mancuernas para tus entrenamientos.', NULL, CURRENT_TIMESTAMP - INTERVAL '12 days'),
+    (2, 1, 'Clase especial de movilidad', 'El próximo sábado habrá una clase abierta de movilidad y recuperación.', NULL, CURRENT_TIMESTAMP - INTERVAL '9 days'),
+    (3, 1, 'Desafío Forze de agosto', 'Participá del desafío mensual y registrá tus mejores marcas.', NULL, CURRENT_TIMESTAMP - INTERVAL '6 days'),
+    (4, 1, 'Nuevos horarios de funcional', 'Agregamos turnos de entrenamiento funcional por la mañana.', NULL, CURRENT_TIMESTAMP - INTERVAL '3 days'),
+    (5, 1, 'Mantenimiento de vestuarios', 'Los vestuarios permanecerán cerrados el domingo de 08:00 a 12:00.', NULL, CURRENT_TIMESTAMP - INTERVAL '1 day');
 
 -- ============================================================
 -- EXERCISES
@@ -238,9 +252,11 @@ INSERT INTO user_tests (
 
 -- Keep identity sequences ahead of the explicit test IDs.
 SELECT setval(pg_get_serial_sequence('user_roles', 'id'), COALESCE((SELECT MAX(id) FROM user_roles), 1), true);
+SELECT setval(pg_get_serial_sequence('coach_types', 'id'), COALESCE((SELECT MAX(id) FROM coach_types), 1), true);
 SELECT setval(pg_get_serial_sequence('users', 'id'), COALESCE((SELECT MAX(id) FROM users), 1), true);
 SELECT setval(pg_get_serial_sequence('gyms', 'id'), COALESCE((SELECT MAX(id) FROM gyms), 1), true);
 SELECT setval(pg_get_serial_sequence('user_gyms', 'id'), COALESCE((SELECT MAX(id) FROM user_gyms), 1), true);
+SELECT setval(pg_get_serial_sequence('gym_coaches', 'id'), COALESCE((SELECT MAX(id) FROM gym_coaches), 1), true);
 SELECT setval(pg_get_serial_sequence('news', 'id'), COALESCE((SELECT MAX(id) FROM news), 1), true);
 SELECT setval(pg_get_serial_sequence('exercises', 'id'), COALESCE((SELECT MAX(id) FROM exercises), 1), true);
 SELECT setval(pg_get_serial_sequence('quantity_types', 'id'), COALESCE((SELECT MAX(id) FROM quantity_types), 1), true);

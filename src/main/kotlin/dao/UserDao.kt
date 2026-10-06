@@ -10,6 +10,8 @@ object Users : LongIdTable("users") {
     val lastName = varchar("lastname", 100)
     val email = varchar("email", 255).uniqueIndex()
     val password = varchar("password", 255)
+    val phone = varchar("phone", 50).nullable()
+    val address = varchar("address", 255).nullable()
 }
 
 class UserDao(id: EntityID<Long>) : LongEntity(id) {
@@ -19,4 +21,6 @@ class UserDao(id: EntityID<Long>) : LongEntity(id) {
     var lastName by Users.lastName
     var email by Users.email
     var password by Users.password
+    var phone by Users.phone
+    var address by Users.address
 }

@@ -15,6 +15,8 @@ CREATE TABLE users (
                        avatar_url TEXT,
                        firstname VARCHAR(100) NOT NULL,
                        lastname VARCHAR(100) NOT NULL,
+                       phone VARCHAR(50),
+                       address VARCHAR(255),
 
                        CONSTRAINT uq_users_email UNIQUE (email)
 );
@@ -63,6 +65,17 @@ CREATE TABLE user_roles (
 );
 
 -- ============================================================
+-- COACH TYPES
+-- ============================================================
+
+CREATE TABLE coach_types (
+                             id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+                             name VARCHAR(100) NOT NULL,
+
+                             CONSTRAINT uq_coach_types_name UNIQUE (name)
+);
+
+-- ============================================================
 -- USER <-> GYM
 -- ============================================================
 
@@ -88,6 +101,37 @@ CREATE TABLE user_gyms (
 );
 
 -- ============================================================
+-- GYM <-> COACH
+--
+-- This models the internal staff structure independently from a user's
+-- membership role in the gym.
+-- ============================================================
+
+CREATE TABLE gym_coaches (
+                              id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+                              id_user BIGINT NOT NULL,
+                              id_gym BIGINT NOT NULL,
+                              id_coach_type BIGINT NOT NULL,
+                              start_date DATE NOT NULL,
+                              end_date DATE,
+
+                              CONSTRAINT fk_gym_coaches_user
+                                  FOREIGN KEY (id_user) REFERENCES users(id) ON DELETE CASCADE,
+
+                              CONSTRAINT fk_gym_coaches_gym
+                                  FOREIGN KEY (id_gym) REFERENCES gyms(id) ON DELETE CASCADE,
+
+                              CONSTRAINT fk_gym_coaches_coach_type
+                                  FOREIGN KEY (id_coach_type) REFERENCES coach_types(id),
+
+                              CONSTRAINT chk_gym_coaches_dates
+                                  CHECK (end_date IS NULL OR end_date >= start_date),
+
+                              CONSTRAINT uq_gym_coaches_assignment
+                                  UNIQUE (id_user, id_gym, id_coach_type, start_date)
+);
+
+-- ============================================================
 -- NEWS
 -- ============================================================
 
@@ -96,6 +140,7 @@ CREATE TABLE news (
                       id_gym BIGINT NOT NULL,
                       title VARCHAR(255) NOT NULL,
                       description TEXT NOT NULL,
+                      image_url TEXT DEFAULT NULL,
                       date TIMESTAMPTZ NOT NULL,
 
                       CONSTRAINT fk_news_gym
@@ -418,6 +463,15 @@ CREATE INDEX idx_user_gyms_gym
 
 CREATE INDEX idx_user_gyms_role
     ON user_gyms(id_user_rol);
+
+CREATE INDEX idx_gym_coaches_gym
+    ON gym_coaches(id_gym);
+
+CREATE INDEX idx_gym_coaches_user
+    ON gym_coaches(id_user);
+
+CREATE INDEX idx_gym_coaches_coach_type
+    ON gym_coaches(id_coach_type);
 
 CREATE INDEX idx_news_gym
     ON news(id_gym);
