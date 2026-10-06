@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.concatstudio.onegym.ServerTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-10-05T19:08:34.533Z" hostname="NACHONOTEBOOK" time="2.93">
+  <properties/>
+  <testcase name="test root endpoint" classname="com.concatstudio.onegym.ServerTest" time="2.924"/>
+  <system-out><![CDATA[2026-10-05 16:08:36.109 [DefaultDispatcher-worker-2 @call-context#3] INFO  io.ktor.test - No ktor.deployment.watch patterns specified, automatic reload is not active.
+2026-10-05 16:08:37.326 [DefaultDispatcher-worker-2 @call-context#3] INFO  io.ktor.test - Application started in 1.25 seconds.
+2026-10-05 16:08:37.330 [DefaultDispatcher-worker-1 @coroutine#5] INFO  io.ktor.test - Responding at http://localhost:80
+2026-10-05 16:08:37.330 [DefaultDispatcher-worker-1 @coroutine#5] INFO  io.ktor.test - Responding at https://localhost:443
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
