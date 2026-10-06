@@ -36,6 +36,7 @@ class UserRepositoryImp : UserRepository {
                 lastName = user.lastName
                 email = user.email
                 password = PasswordService.encode(user.password)
+                avatarUrl = user.avatarUrl
                 phone = user.phone
                 address = user.address
             }
@@ -55,6 +56,7 @@ class UserRepositoryImp : UserRepository {
                 lastName = user.lastName
                 email = user.email
                 password = PasswordService.encode(user.password)
+                avatarUrl = user.avatarUrl
                 phone = user.phone
                 address = user.address
             }

@@ -355,6 +355,7 @@ CREATE TABLE current_plan_activities (
                                          id_user_plan BIGINT NOT NULL,
                                          id_week_active BIGINT,
                                          id_day_active BIGINT,
+                                         is_active BOOLEAN NOT NULL DEFAULT FALSE,
 
                                          CONSTRAINT fk_current_plan_activity_user_plan
                                              FOREIGN KEY (id_user_plan) REFERENCES user_plans(id),

@@ -14,6 +14,7 @@ val appDiModules = module {
     single<GymHomeRepository> { GymHomeRepositoryImp() }
     single<CoachTypeRepository> { CoachTypeRepositoryImp() }
     single<GymCoachRepository> { GymCoachRepositoryImp() }
+    single<ActivePlanRepository> { ActivePlanRepositoryImp() }
     single<UserRepository> { UserRepositoryImp() }
     single<GymRepository> { GymRepositoryImp() }
     single<UserRoleRepository> { UserRoleRepositoryImp() }

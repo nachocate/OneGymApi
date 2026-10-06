@@ -9,6 +9,7 @@ fun toModel(user: UserDao) = User(
     lastName = user.lastName,
     email = user.email,
     password = user.password,
+    avatarUrl = user.avatarUrl,
     phone = user.phone,
     address = user.address
 )
@@ -18,6 +19,7 @@ fun User.toResponse() = UserResponse(
     firstName = firstName,
     lastName = lastName,
     email = email,
+    avatarUrl = avatarUrl,
     phone = phone,
     address = address
 )
@@ -126,7 +128,8 @@ fun toModel(activity: CurrentPlanActivityDao) = CurrentPlanActivity(
     date = activity.date.toString(),
     userPlanId = activity.userPlanId.value,
     activeWeekId = activity.activeWeekId?.value,
-    activeDayId = activity.activeDayId?.value
+    activeDayId = activity.activeDayId?.value,
+    isActive = activity.isActive
 )
 
 fun toModel(register: RegisterDao) = Register(

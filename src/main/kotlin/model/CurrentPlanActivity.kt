@@ -8,5 +8,6 @@ data class CurrentPlanActivity(
     val date: String,
     val userPlanId: Long,
     val activeWeekId: Long?,
-    val activeDayId: Long?
+    val activeDayId: Long?,
+    val isActive: Boolean = false
 )

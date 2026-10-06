@@ -88,6 +88,10 @@ its active coaches. Coaches are assigned through `gym_coaches`, independently
 from the user's membership role, and include their `coachType` and assignment
 dates.
 
+`GET /plan/{gymId}/me` requires an active subscription and returns every active
+plan for the authenticated user in that gym. Plans include their weeks, days,
+blocks, block exercises, quantity types, and active week/day markers.
+
 For an existing database, run
 `src/main/resources/migrations/V2__create_user_refresh_tokens.sql` once before
 deploying. The API does not currently include a migration runner.
@@ -99,6 +103,10 @@ tables. Fresh databases receive these definitions directly from
 
 Run `migrations/V5__add_news_image_url.sql` to add the optional `image_url`
 field to existing news without changing any current records.
+
+Run `migrations/V6__add_current_plan_activity_is_active.sql` to add the
+`is_active` planning flag to existing current-plan activities. Existing rows
+and new rows default to `false`.
 
 ## Resetting a local database
 

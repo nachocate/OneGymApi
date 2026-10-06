@@ -114,6 +114,7 @@ object CurrentPlanActivities : LongIdTable("current_plan_activities") {
     val userPlan = reference("id_user_plan", UserPlans)
     val activeWeek = reference("id_week_active", Weeks).nullable()
     val activeDay = reference("id_day_active", Days).nullable()
+    val isActive = bool("is_active").default(false)
 }
 
 object Registers : LongIdTable("registers") {

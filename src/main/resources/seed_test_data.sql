@@ -33,7 +33,13 @@ OVERRIDING SYSTEM VALUE VALUES
     (1, 'sofia@onegym.test', '$2a$12$lRjI71wrqakSjaVFLQZSZ.xmq2.wn6LbBGQgJWSGndpobIG0ygwl6', NULL, 'Sofia', 'Martinez', '+54 11 5555-0101', 'Av. Siempre Viva 123'),
     (2, 'lucas@onegym.test', '$2a$12$lRjI71wrqakSjaVFLQZSZ.xmq2.wn6LbBGQgJWSGndpobIG0ygwl6', NULL, 'Lucas', 'Fernandez', '+54 11 5555-0102', 'Av. Siempre Viva 124'),
     (3, 'valentina@onegym.test', '$2a$12$lRjI71wrqakSjaVFLQZSZ.xmq2.wn6LbBGQgJWSGndpobIG0ygwl6', NULL, 'Valentina', 'Gomez', '+54 11 5555-0103', 'Av. Siempre Viva 125'),
-    (4, 'admin@onegym.test', '$2a$12$lRjI71wrqakSjaVFLQZSZ.xmq2.wn6LbBGQgJWSGndpobIG0ygwl6', NULL, 'Martin', 'Administrador', '+54 11 5555-0104', 'Av. Siempre Viva 126');
+    (4, 'admin@onegym.test', '$2a$12$lRjI71wrqakSjaVFLQZSZ.xmq2.wn6LbBGQgJWSGndpobIG0ygwl6', NULL, 'Martin', 'Administrador', '+54 11 5555-0104', 'Av. Siempre Viva 126'),
+    (5, 'camila@onegym.test', '$2a$12$lRjI71wrqakSjaVFLQZSZ.xmq2.wn6LbBGQgJWSGndpobIG0ygwl6', NULL, 'Camila', 'Rodriguez', '+54 11 5555-0105', 'Av. Siempre Viva 127'),
+    (6, 'tomas@onegym.test', '$2a$12$lRjI71wrqakSjaVFLQZSZ.xmq2.wn6LbBGQgJWSGndpobIG0ygwl6', NULL, 'Tomas', 'Lopez', '+54 11 5555-0106', 'Av. Siempre Viva 128'),
+    (7, 'julieta@onegym.test', '$2a$12$lRjI71wrqakSjaVFLQZSZ.xmq2.wn6LbBGQgJWSGndpobIG0ygwl6', NULL, 'Julieta', 'Sanchez', '+54 11 5555-0107', 'Av. Siempre Viva 129'),
+    (8, 'diego@onegym.test', '$2a$12$lRjI71wrqakSjaVFLQZSZ.xmq2.wn6LbBGQgJWSGndpobIG0ygwl6', NULL, 'Diego', 'Romero', '+54 11 5555-0108', 'Av. Siempre Viva 130'),
+    (9, 'paula@onegym.test', '$2a$12$lRjI71wrqakSjaVFLQZSZ.xmq2.wn6LbBGQgJWSGndpobIG0ygwl6', NULL, 'Paula', 'Diaz', '+54 11 5555-0109', 'Av. Siempre Viva 131'),
+    (10, 'nicolas@onegym.test', '$2a$12$lRjI71wrqakSjaVFLQZSZ.xmq2.wn6LbBGQgJWSGndpobIG0ygwl6', NULL, 'Nicolas', 'Silva', '+54 11 5555-0110', 'Av. Siempre Viva 132');
 
 -- ============================================================
 -- GYM
@@ -48,12 +54,25 @@ OVERRIDING SYSTEM VALUE VALUES
     (1, 1, 1, 1, CURRENT_DATE - 90, NULL),
     (2, 2, 1, 1, CURRENT_DATE - 60, NULL),
     (3, 3, 1, 1, CURRENT_DATE - 45, NULL),
-    (4, 4, 1, 3, CURRENT_DATE - 365, NULL);
+    (4, 4, 1, 3, CURRENT_DATE - 365, NULL),
+    (5, 5, 1, 2, CURRENT_DATE - 300, NULL),
+    (6, 6, 1, 1, CURRENT_DATE - 240, NULL),
+    (7, 7, 1, 1, CURRENT_DATE - 180, NULL),
+    (8, 8, 1, 1, CURRENT_DATE - 150, NULL),
+    (9, 9, 1, 1, CURRENT_DATE - 120, NULL),
+    (10, 10, 1, 1, CURRENT_DATE - 90, NULL);
 
 INSERT INTO gym_coaches (id, id_user, id_gym, id_coach_type, start_date, end_date)
 OVERRIDING SYSTEM VALUE VALUES
     (1, 2, 1, 1, CURRENT_DATE - 180, NULL),
-    (2, 3, 1, 2, CURRENT_DATE - 120, NULL);
+    (2, 3, 1, 2, CURRENT_DATE - 120, NULL),
+    (3, 5, 1, 1, CURRENT_DATE - 300, NULL),
+    (4, 6, 1, 2, CURRENT_DATE - 240, NULL),
+    (5, 7, 1, 2, CURRENT_DATE - 180, NULL),
+    (6, 8, 1, 3, CURRENT_DATE - 150, NULL),
+    (7, 9, 1, 3, CURRENT_DATE - 120, NULL),
+    -- Historical assignment: it remains in the database but is excluded from /{gymId}/home.
+    (8, 10, 1, 3, CURRENT_DATE - 180, CURRENT_DATE - 10);
 
 -- ============================================================
 -- NEWS
@@ -114,7 +133,19 @@ OVERRIDING SYSTEM VALUE VALUES
     (5, 'Valentina - Fuerza inicial', 1, 1, NULL),
     (6, 'Valentina - Progresion personal', 1, 2, NULL),
     (7, 'Martin - Fuerza inicial', 1, 1, NULL),
-    (8, 'Martin - Progresion personal', 1, 2, NULL);
+    (8, 'Martin - Progresion personal', 1, 2, NULL),
+    (9, 'Camila - Fuerza inicial', 1, 1, NULL),
+    (10, 'Camila - Progresion personal', 1, 2, NULL),
+    (11, 'Tomas - Fuerza inicial', 1, 1, NULL),
+    (12, 'Tomas - Progresion personal', 1, 2, NULL),
+    (13, 'Julieta - Fuerza inicial', 1, 1, NULL),
+    (14, 'Julieta - Progresion personal', 1, 2, NULL),
+    (15, 'Diego - Fuerza inicial', 1, 1, NULL),
+    (16, 'Diego - Progresion personal', 1, 2, NULL),
+    (17, 'Paula - Fuerza inicial', 1, 1, NULL),
+    (18, 'Paula - Progresion personal', 1, 2, NULL),
+    (19, 'Nicolas - Fuerza inicial', 1, 1, NULL),
+    (20, 'Nicolas - Progresion personal', 1, 2, NULL);
 
 INSERT INTO user_plans (id, id_user, id_plan) OVERRIDING SYSTEM VALUE VALUES
     (1, 1, 1),
@@ -124,7 +155,19 @@ INSERT INTO user_plans (id, id_user, id_plan) OVERRIDING SYSTEM VALUE VALUES
     (5, 3, 5),
     (6, 3, 6),
     (7, 4, 7),
-    (8, 4, 8);
+    (8, 4, 8),
+    (9, 5, 9),
+    (10, 5, 10),
+    (11, 6, 11),
+    (12, 6, 12),
+    (13, 7, 13),
+    (14, 7, 14),
+    (15, 8, 15),
+    (16, 8, 16),
+    (17, 9, 17),
+    (18, 9, 18),
+    (19, 10, 19),
+    (20, 10, 20);
 
 -- ============================================================
 -- WEEKS, DAYS, BLOCKS AND BLOCK EXERCISES
@@ -144,7 +187,7 @@ DECLARE
     block_position INTEGER;
     exercise_position INTEGER;
 BEGIN
-    FOR plan_id_value IN 1..8 LOOP
+    FOR plan_id_value IN 1..20 LOOP
         FOR week_number IN 1..2 LOOP
             week_id_value := (plan_id_value - 1) * 2 + week_number;
 
@@ -211,12 +254,18 @@ END $$;
 -- ============================================================
 
 INSERT INTO current_plan_activities
-    (id, "date", id_user_plan, id_week_active, id_day_active)
+    (id, "date", id_user_plan, id_week_active, id_day_active, is_active)
 OVERRIDING SYSTEM VALUE VALUES
-    (1, CURRENT_TIMESTAMP, 1, 1, 1),
-    (2, CURRENT_TIMESTAMP, 3, 5, 9),
-    (3, CURRENT_TIMESTAMP, 5, 9, 17),
-    (4, CURRENT_TIMESTAMP, 7, 13, 25);
+    (1, CURRENT_TIMESTAMP, 1, 1, 1, TRUE),
+    (2, CURRENT_TIMESTAMP, 3, 5, 9, TRUE),
+    (3, CURRENT_TIMESTAMP, 5, 9, 17, TRUE),
+    (4, CURRENT_TIMESTAMP, 7, 13, 25, TRUE),
+    (5, CURRENT_TIMESTAMP, 9, 17, 33, TRUE),
+    (6, CURRENT_TIMESTAMP, 11, 21, 41, TRUE),
+    (7, CURRENT_TIMESTAMP, 13, 25, 49, TRUE),
+    (8, CURRENT_TIMESTAMP, 15, 29, 57, TRUE),
+    (9, CURRENT_TIMESTAMP, 17, 33, 65, TRUE),
+    (10, CURRENT_TIMESTAMP, 19, 37, 73, TRUE);
 
 -- ============================================================
 -- PROGRAMMED WEIGHTS / REGISTERS

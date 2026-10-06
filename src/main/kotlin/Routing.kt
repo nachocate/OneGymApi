@@ -18,9 +18,11 @@ fun Application.configureRouting() {
         }
         authenticationRouting()
         authenticate("auth-jwt") {
+            profileRouting()
             statusRouting()
             gymNewsRouting()
             gymHomeRouting()
+            activePlanRouting()
             coachTypeRouting()
             gymCoachRouting()
             userRouting()
