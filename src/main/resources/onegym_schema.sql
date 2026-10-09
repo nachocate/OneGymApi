@@ -229,7 +229,12 @@ CREATE TABLE exercises (
                            name VARCHAR(150) NOT NULL,
                            description TEXT,
                            video_url TEXT,
-                           image_url TEXT
+                           image_url TEXT,
+                           id_gym BIGINT,
+                           is_visible_global BOOLEAN NOT NULL DEFAULT TRUE,
+
+                           CONSTRAINT fk_exercises_gym
+                               FOREIGN KEY (id_gym) REFERENCES gyms(id) ON DELETE SET NULL
 );
 
 -- ============================================================
@@ -409,10 +414,22 @@ CREATE TABLE registers (
 --   repetitions = 3, quantity = 100, quantity_type = KG
 -- ============================================================
 
+CREATE TABLE evaluations (
+                             id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+                             name VARCHAR(150) NOT NULL,
+                             description TEXT,
+                             creation_date TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ============================================================
+-- USER TESTS
+-- ============================================================
+
 CREATE TABLE user_tests (
                             id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
                             id_exercise BIGINT NOT NULL,
                             id_user BIGINT NOT NULL,
+                            id_evaluation BIGINT NOT NULL,
                             id_quantity_type BIGINT,
                             repetitions INTEGER,
                             quantity NUMERIC(10, 2),
@@ -424,6 +441,9 @@ CREATE TABLE user_tests (
 
                             CONSTRAINT fk_user_tests_user
                                 FOREIGN KEY (id_user) REFERENCES users(id),
+
+                            CONSTRAINT fk_user_tests_evaluation
+                                FOREIGN KEY (id_evaluation) REFERENCES evaluations(id),
 
                             CONSTRAINT fk_user_tests_quantity_type
                                 FOREIGN KEY (id_quantity_type) REFERENCES quantity_types(id),
@@ -495,6 +515,9 @@ CREATE INDEX idx_weeks_plan
 CREATE INDEX idx_days_week
     ON days(id_week);
 
+CREATE INDEX idx_exercises_gym
+    ON exercises(id_gym);
+
 CREATE INDEX idx_blocks_day
     ON blocks(id_day);
 
@@ -536,6 +559,9 @@ CREATE INDEX idx_user_tests_user
 
 CREATE INDEX idx_user_tests_exercise
     ON user_tests(id_exercise);
+
+CREATE INDEX idx_user_tests_evaluation
+    ON user_tests(id_evaluation);
 
 CREATE INDEX idx_user_tests_quantity_type
     ON user_tests(id_quantity_type);

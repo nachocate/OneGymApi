@@ -11,6 +11,7 @@ class UserTestDao(id: EntityID<Long>) : LongEntity(id) {
     companion object : LongEntityClass<UserTestDao>(UserTests)
     var exerciseId by UserTests.exercise
     var userId by UserTests.user
+    var evaluationId: EntityID<Long> by UserTests.evaluation
     var quantityTypeId by UserTests.quantityType
     var repetitions by UserTests.repetitions
     var quantity: BigDecimal? by UserTests.quantity

@@ -14,3 +14,4 @@ internal fun exerciseRef(id: Long) = ExerciseDao.findById(id)!!.id
 internal fun quantityTypeRef(id: Long) = QuantityTypeDao.findById(id)!!.id
 internal fun blockRef(id: Long) = BlockDao.findById(id)!!.id
 internal fun userPlanRef(id: Long) = UserPlanDao.findById(id)!!.id
+internal fun evaluationRef(id: Long) = EvaluationDao.findById(id)!!.id

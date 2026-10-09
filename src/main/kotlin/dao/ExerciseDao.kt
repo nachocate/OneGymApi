@@ -11,4 +11,6 @@ class ExerciseDao(id: EntityID<Long>) : LongEntity(id) {
     var description by Exercises.description
     var videoUrl by Exercises.videoUrl
     var imageUrl by Exercises.imageUrl
+    var gymId by Exercises.gym
+    var isVisibleGlobal by Exercises.isVisibleGlobal
 }

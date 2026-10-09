@@ -3,12 +3,9 @@ package com.concatstudio.onegym.model
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Exercise(
+data class Evaluation(
     val id: Long,
     val name: String,
     val description: String?,
-    val videoUrl: String?,
-    val imageUrl: String?,
-    val gymId: Long? = null,
-    val isVisibleGlobal: Boolean = true
+    val creationDate: String
 )

@@ -7,6 +7,7 @@ data class UserTest(
     val id: Long,
     val exerciseId: Long,
     val userId: Long,
+    val evaluationId: Long,
     val quantityTypeId: Long?,
     val repetitions: Int?,
     val quantity: Double?,

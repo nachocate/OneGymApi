@@ -25,6 +25,7 @@ val appDiModules = module {
     single<WeekRepository> { WeekRepositoryImp() }
     single<DayRepository> { DayRepositoryImp() }
     single<ExerciseRepository> { ExerciseRepositoryImp() }
+    single<EvaluationRepository> { EvaluationRepositoryImp() }
     single<QuantityTypeRepository> { QuantityTypeRepositoryImp() }
     single<BlockRepository> { BlockRepositoryImp() }
     single<BlockExerciseRepository> { BlockExerciseRepositoryImp() }

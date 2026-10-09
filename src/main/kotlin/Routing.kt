@@ -35,6 +35,7 @@ fun Application.configureRouting() {
             weekRouting()
             dayRouting()
             exerciseRouting()
+            evaluationRouting()
             quantityTypeRouting()
             blockRouting()
             blockExerciseRouting()

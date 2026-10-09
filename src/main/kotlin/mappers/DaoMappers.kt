@@ -91,7 +91,16 @@ fun toModel(exercise: ExerciseDao) = Exercise(
     name = exercise.name,
     description = exercise.description,
     videoUrl = exercise.videoUrl,
-    imageUrl = exercise.imageUrl
+    imageUrl = exercise.imageUrl,
+    gymId = exercise.gymId?.value,
+    isVisibleGlobal = exercise.isVisibleGlobal
+)
+
+fun toModel(evaluation: EvaluationDao) = Evaluation(
+    id = evaluation.id.value,
+    name = evaluation.name,
+    description = evaluation.description,
+    creationDate = evaluation.creationDate.toString()
 )
 
 fun toModel(quantityType: QuantityTypeDao) = QuantityType(
@@ -144,6 +153,7 @@ fun toModel(test: UserTestDao) = UserTest(
     id = test.id.value,
     exerciseId = test.exerciseId.value,
     userId = test.userId.value,
+    evaluationId = test.evaluationId.value,
     quantityTypeId = test.quantityTypeId?.value,
     repetitions = test.repetitions,
     quantity = test.quantity?.toDouble(),

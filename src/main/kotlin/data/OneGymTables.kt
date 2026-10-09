@@ -82,6 +82,8 @@ object Exercises : LongIdTable("exercises") {
     val description = text("description").nullable()
     val videoUrl = text("video_url").nullable()
     val imageUrl = text("image_url").nullable()
+    val gym = reference("id_gym", Gyms).nullable()
+    val isVisibleGlobal = bool("is_visible_global").default(true)
 }
 
 object QuantityTypes : LongIdTable("quantity_types") {
@@ -124,9 +126,16 @@ object Registers : LongIdTable("registers") {
     val weight = decimal("weight", 10, 2)
 }
 
+object Evaluations : LongIdTable("evaluations") {
+    val name = varchar("name", 150)
+    val description = text("description").nullable()
+    val creationDate = timestampWithTimeZone("creation_date")
+}
+
 object UserTests : LongIdTable("user_tests") {
     val exercise = reference("id_exercise", Exercises)
     val user = reference("id_user", Users)
+    val evaluation = reference("id_evaluation", Evaluations)
     val quantityType = reference("id_quantity_type", QuantityTypes).nullable()
     val repetitions = integer("repetitions").nullable()
     val quantity = decimal("quantity", 10, 2).nullable()

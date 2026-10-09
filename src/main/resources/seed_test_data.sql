@@ -90,18 +90,18 @@ OVERRIDING SYSTEM VALUE VALUES
 -- EXERCISES
 -- ============================================================
 
-INSERT INTO exercises (id, name, description, video_url, image_url)
+INSERT INTO exercises (id, name, description, video_url, image_url, id_gym, is_visible_global)
 OVERRIDING SYSTEM VALUE VALUES
-    (1, 'Sentadilla con barra', 'Sentadilla trasera con barra.', NULL, NULL),
-    (2, 'Press de banca', 'Press horizontal con barra.', NULL, NULL),
-    (3, 'Peso muerto', 'Peso muerto convencional.', NULL, NULL),
-    (4, 'Dominadas', 'Dominadas con agarre prono.', NULL, NULL),
-    (5, 'Burpees', 'Burpee completo con salto.', NULL, NULL),
-    (6, 'Zancadas', 'Zancadas alternadas con peso corporal.', NULL, NULL),
-    (7, 'Remo con mancuerna', 'Remo unilateral con mancuerna.', NULL, NULL),
-    (8, 'Plancha', 'Plancha isométrica frontal.', NULL, NULL),
-    (9, 'Kettlebell swing', 'Balanceo de kettlebell.', NULL, NULL),
-    (10, 'Carrera', 'Carrera continua o por intervalos.', NULL, NULL);
+    (1, 'Sentadilla con barra', 'Sentadilla trasera con barra.', NULL, NULL, NULL, TRUE),
+    (2, 'Press de banca', 'Press horizontal con barra.', NULL, NULL, NULL, TRUE),
+    (3, 'Peso muerto', 'Peso muerto convencional.', NULL, NULL, NULL, TRUE),
+    (4, 'Dominadas', 'Dominadas con agarre prono.', NULL, NULL, NULL, TRUE),
+    (5, 'Burpees', 'Burpee completo con salto.', NULL, NULL, NULL, TRUE),
+    (6, 'Zancadas', 'Zancadas alternadas con peso corporal.', NULL, NULL, NULL, TRUE),
+    (7, 'Remo con mancuerna', 'Remo unilateral con mancuerna.', NULL, NULL, 1, FALSE),
+    (8, 'Plancha', 'Plancha isométrica frontal.', NULL, NULL, NULL, TRUE),
+    (9, 'Kettlebell swing', 'Balanceo de kettlebell.', NULL, NULL, 1, FALSE),
+    (10, 'Carrera', 'Carrera continua o por intervalos.', NULL, NULL, NULL, TRUE);
 
 -- ============================================================
 -- QUANTITY TYPES
@@ -286,18 +286,23 @@ OVERRIDING SYSTEM VALUE VALUES
 -- USER TESTS
 -- ============================================================
 
+INSERT INTO evaluations (id, name, description, creation_date)
+OVERRIDING SYSTEM VALUE VALUES
+    (1, 'Evaluacion inicial', 'Mediciones de ingreso de los usuarios.', CURRENT_TIMESTAMP - INTERVAL '30 days'),
+    (2, 'Evaluacion de seguimiento', 'Mediciones para controlar el progreso.', CURRENT_TIMESTAMP - INTERVAL '10 days');
+
 INSERT INTO user_tests (
-    id, id_exercise, id_user, id_quantity_type,
+    id, id_exercise, id_user, id_evaluation, id_quantity_type,
     repetitions, quantity, "date", description
 ) OVERRIDING SYSTEM VALUE VALUES
-    (1, 1, 1, 5, 5, 60.00, CURRENT_TIMESTAMP - INTERVAL '30 days', 'Test inicial de sentadilla.'),
-    (2, 2, 1, 5, 5, 40.00, CURRENT_TIMESTAMP - INTERVAL '25 days', 'Test inicial de press de banca.'),
-    (3, 3, 2, 5, 5, 80.00, CURRENT_TIMESTAMP - INTERVAL '20 days', 'Test inicial de peso muerto.'),
-    (4, 4, 2, NULL, 8, NULL, CURRENT_TIMESTAMP - INTERVAL '15 days', 'Cantidad maxima de dominadas.'),
-    (5, 5, 3, NULL, 20, NULL, CURRENT_TIMESTAMP - INTERVAL '12 days', 'Test de burpees en un minuto.'),
-    (6, 6, 3, 5, 10, 20.00, CURRENT_TIMESTAMP - INTERVAL '10 days', 'Test de zancadas con carga.'),
-    (7, 9, 4, 5, 10, 16.00, CURRENT_TIMESTAMP - INTERVAL '8 days', 'Test de kettlebell swing.'),
-    (8, 10, 4, 4, NULL, 5.00, CURRENT_TIMESTAMP - INTERVAL '5 days', 'Test de carrera de cinco kilometros.');
+    (1, 1, 1, 1, 5, 5, 60.00, CURRENT_TIMESTAMP - INTERVAL '30 days', 'Test inicial de sentadilla.'),
+    (2, 2, 1, 1, 5, 5, 40.00, CURRENT_TIMESTAMP - INTERVAL '25 days', 'Test inicial de press de banca.'),
+    (3, 3, 2, 1, 5, 5, 80.00, CURRENT_TIMESTAMP - INTERVAL '20 days', 'Test inicial de peso muerto.'),
+    (4, 4, 2, 1, NULL, 8, NULL, CURRENT_TIMESTAMP - INTERVAL '15 days', 'Cantidad maxima de dominadas.'),
+    (5, 5, 3, 2, NULL, 20, NULL, CURRENT_TIMESTAMP - INTERVAL '12 days', 'Test de burpees en un minuto.'),
+    (6, 6, 3, 2, 5, 10, 20.00, CURRENT_TIMESTAMP - INTERVAL '10 days', 'Test de zancadas con carga.'),
+    (7, 9, 4, 2, 5, 10, 16.00, CURRENT_TIMESTAMP - INTERVAL '8 days', 'Test de kettlebell swing.'),
+    (8, 10, 4, 2, 4, NULL, 5.00, CURRENT_TIMESTAMP - INTERVAL '5 days', 'Test de carrera de cinco kilometros.');
 
 -- Keep identity sequences ahead of the explicit test IDs.
 SELECT setval(pg_get_serial_sequence('user_roles', 'id'), COALESCE((SELECT MAX(id) FROM user_roles), 1), true);
@@ -318,6 +323,7 @@ SELECT setval(pg_get_serial_sequence('blocks', 'id'), COALESCE((SELECT MAX(id) F
 SELECT setval(pg_get_serial_sequence('block_exercises', 'id'), COALESCE((SELECT MAX(id) FROM block_exercises), 1), true);
 SELECT setval(pg_get_serial_sequence('current_plan_activities', 'id'), COALESCE((SELECT MAX(id) FROM current_plan_activities), 1), true);
 SELECT setval(pg_get_serial_sequence('registers', 'id'), COALESCE((SELECT MAX(id) FROM registers), 1), true);
+SELECT setval(pg_get_serial_sequence('evaluations', 'id'), COALESCE((SELECT MAX(id) FROM evaluations), 1), true);
 SELECT setval(pg_get_serial_sequence('user_tests', 'id'), COALESCE((SELECT MAX(id) FROM user_tests), 1), true);
 
 COMMIT;
