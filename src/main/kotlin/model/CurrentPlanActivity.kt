@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class CurrentPlanActivity(
-    val id: Long,
+    val id: Long = 0,
     val date: String,
     val userPlanId: Long,
     val activeWeekId: Long?,

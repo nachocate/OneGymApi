@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class GymCoach(
-    val id: Long,
+    val id: Long = 0,
     val userId: Long,
     val gymId: Long,
     val coachTypeId: Long,

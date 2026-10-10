@@ -60,6 +60,27 @@ can be used later and take priority over `application.conf`.
 
 ## Authentication
 
+## Resource identifiers
+
+Every persisted resource uses a database-generated, auto-incrementing `Long` ID.
+For every `POST` endpoint, omit `id` from the JSON body; the database assigns it.
+The generated ID is returned by subsequent resource reads. IDs in request bodies are
+ignored by the create repositories and must never be chosen by clients.
+
+For example, create a user with:
+
+```json
+{
+  "email": "nachocate@gmail.com",
+  "password": "nachocate@gmail.com",
+  "firstName": "Ignacio",
+  "lastName": "Catena",
+  "avatarUrl": null,
+  "phone": null,
+  "address": null
+}
+```
+
 All resource routes require `Authorization: Bearer <accessToken>`. Local JWT
 settings are in `src/main/resources/application.conf`. For production, override
 the values with these environment variables (use independent random values of

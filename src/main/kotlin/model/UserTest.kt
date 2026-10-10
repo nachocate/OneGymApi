@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class UserTest(
-    val id: Long,
+    val id: Long = 0,
     val exerciseId: Long,
     val userId: Long,
     val evaluationId: Long,

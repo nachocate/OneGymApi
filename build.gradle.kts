@@ -18,6 +18,7 @@ dependencies {
     implementation(ktorLibs.serialization.kotlinx.json)
     implementation(ktorLibs.server.contentNegotiation)
     implementation(ktorLibs.server.core)
+    implementation("io.ktor:ktor-server-cors:3.6.0")
     implementation(ktorLibs.server.netty)
     implementation("io.ktor:ktor-server-auth-jwt:3.6.0")
     implementation(libs.logback.classic)

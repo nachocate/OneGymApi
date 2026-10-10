@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class BlockExercise(
-    val id: Long,
+    val id: Long = 0,
     val blockId: Long,
     val exerciseId: Long,
     val quantityTypeId: Long?,
