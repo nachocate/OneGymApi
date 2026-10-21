@@ -8,6 +8,7 @@ Documentación para administrar los roles que se asignan a un usuario dentro de 
 - Todos los endpoints requieren `Authorization: Bearer <accessToken>`.
 - En `POST` y `PUT`, enviar `Content-Type: application/json`.
 - Los IDs son `Long` autogenerados. El nombre del rol debe ser único.
+- Las lecturas están disponibles para cualquier usuario autenticado. Crear, modificar o eliminar roles es exclusivo de Super Admin.
 
 ## Estructura de un rol
 

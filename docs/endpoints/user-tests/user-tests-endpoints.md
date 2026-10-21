@@ -59,11 +59,11 @@ Documentación para registrar el resultado de un usuario en un ejercicio dentro 
 ## 1. Listar tests de usuario
 
 ```http
-GET {BASE_URL}/user-tests
+GET {BASE_URL}/user-tests?userId=1
 Authorization: Bearer <accessToken>
 ```
 
-**Respuesta — `200 OK`**: un arreglo de objetos con la estructura anterior.
+**Respuesta — `200 OK`**: tests del usuario indicado. El propio usuario o cualquier persona que comparta gimnasio puede leerlos; crear, modificar o eliminar requiere `COACH` o superior compartiendo gimnasio.
 
 ## 2. Obtener un test por ID
 
@@ -126,4 +126,4 @@ Authorization: Bearer <accessToken>
 
 **Respuesta — `204 No Content`**
 
-No devuelve body. Actualmente responde `204` aun si el ID no existía.
+No devuelve body. Devuelve `404 Not Found` si el test no existe y `403 Forbidden` si no puede gestionar los datos de entrenamiento de ese usuario.

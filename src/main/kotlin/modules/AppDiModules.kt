@@ -4,6 +4,7 @@ import com.concatstudio.onegym.data.*
 import com.concatstudio.onegym.respository.*
 import com.concatstudio.onegym.security.JwtService
 import com.concatstudio.onegym.security.JwtSettings
+import com.concatstudio.onegym.security.AuthorizationService
 import org.koin.dsl.module
 
 val appDiModules = module {
@@ -17,6 +18,9 @@ val appDiModules = module {
     single<ActivePlanRepository> { ActivePlanRepositoryImp() }
     single<UserRepository> { UserRepositoryImp() }
     single<GymRepository> { GymRepositoryImp() }
+    single { GymManagementService() }
+    single { AuthorizationService() }
+    single<GymBusinessHourRepository> { GymBusinessHourRepositoryImp() }
     single<UserRoleRepository> { UserRoleRepositoryImp() }
     single<UserGymRepository> { UserGymRepositoryImp() }
     single<NewsRepository> { NewsRepositoryImp() }

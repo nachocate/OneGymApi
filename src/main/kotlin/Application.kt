@@ -31,6 +31,7 @@ fun Application.rootModule() {
         modules(appDiModules)
 
     }
+    configureStatusPages()
 
     install(Authentication) {
         jwt("auth-jwt") {

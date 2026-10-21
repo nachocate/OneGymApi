@@ -24,7 +24,7 @@ Authorization: Bearer <accessToken>
     "id": 1,
     "name": "Forze Gym",
     "description": "Gimnasio de entrenamiento funcional y fuerza.",
-    "schedule": "Lunes a viernes 07:00-22:00",
+    "localityId": 1,
     "address": "Av. Siempre Viva 123",
     "phone": "+54 11 5555-0101",
     "logoUrl": "https://cdn.ejemplo.com/gyms/forze/logo.png",

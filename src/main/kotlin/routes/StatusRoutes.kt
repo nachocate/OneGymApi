@@ -21,6 +21,12 @@ fun Route.statusRouting() {
         }
 
         val subscriptions = statusRepository.getActiveGymSubscriptions(userId)
-        call.respond(UserStatusResponse(gymCount = subscriptions.size, gyms = subscriptions))
+        call.respond(
+            UserStatusResponse(
+                gymCount = subscriptions.size,
+                systemRoles = statusRepository.getSystemRoleNames(userId),
+                gyms = subscriptions
+            )
+        )
     }
 }

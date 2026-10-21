@@ -28,11 +28,19 @@ fun toModel(gym: GymDao) = Gym(
     id = gym.id.value,
     name = gym.name,
     description = gym.description,
-    schedule = gym.schedule,
+    localityId = gym.localityId.value,
     address = gym.address,
     phone = gym.phone,
     logoUrl = gym.logoUrl,
     bannerUrl = gym.bannerUrl
+)
+
+fun toModel(gymBusinessHour: GymBusinessHourDao) = GymBusinessHour(
+    id = gymBusinessHour.id.value,
+    gymId = gymBusinessHour.gymId.value,
+    dayOfWeek = gymBusinessHour.dayOfWeek,
+    opensAt = gymBusinessHour.opensAt.toString(),
+    closesAt = gymBusinessHour.closesAt.toString()
 )
 
 fun toModel(role: UserRoleDao) = UserRole(role.id.value, role.name)
@@ -98,6 +106,7 @@ fun toModel(exercise: ExerciseDao) = Exercise(
 
 fun toModel(evaluation: EvaluationDao) = Evaluation(
     id = evaluation.id.value,
+    userId = evaluation.userId.value,
     name = evaluation.name,
     description = evaluation.description,
     creationDate = evaluation.creationDate.toString()

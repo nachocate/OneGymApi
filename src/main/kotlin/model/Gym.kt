@@ -7,7 +7,7 @@ data class Gym(
     val id: Long = 0,
     val name: String,
     val description: String?,
-    val schedule: String?,
+    val localityId: Long,
     val address: String?,
     val phone: String?,
     val logoUrl: String?,

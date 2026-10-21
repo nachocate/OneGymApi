@@ -12,7 +12,7 @@ Documentación para la administración de usuarios.
 
 ## Estructuras
 
-**Body de creación o actualización**
+**Body de creación**
 
 ```json
 {
@@ -26,7 +26,8 @@ Documentación para la administración de usuarios.
 }
 ```
 
-`avatarUrl`, `phone` y `address` pueden ser `null`. Todos los demás campos son obligatorios. En un `PUT`, la contraseña enviada reemplaza la anterior.
+`avatarUrl`, `phone` y `address` pueden ser `null`. Todos los demás campos son obligatorios.
+El email se guarda sin espacios externos y en minúsculas; la unicidad no distingue mayúsculas/minúsculas.
 
 **Estructura de respuesta**
 
@@ -98,7 +99,20 @@ Authorization: Bearer <accessToken>
 Content-Type: application/json
 ```
 
-Enviar el body de creación completo. El `id` de la URL determina el usuario a modificar.
+El perfil se actualiza sin contraseña. El `id` de la URL determina el usuario a modificar.
+
+```json
+{
+  "firstName": "Sofia",
+  "lastName": "Martinez",
+  "email": "sofia@onegym.test",
+  "avatarUrl": "https://cdn.ejemplo.com/avatars/sofia.png",
+  "phone": "+54 11 5555-0101",
+  "address": "Av. Siempre Viva 123"
+}
+```
+
+Para cambiar la contraseña usar exclusivamente `PUT /users/{id}/password`.
 
 **Respuesta — `204 No Content`**
 

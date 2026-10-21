@@ -8,7 +8,7 @@ import org.jetbrains.exposed.v1.dao.LongEntityClass
 object Users : LongIdTable("users") {
     val firstName = varchar("firstname", 100)
     val lastName = varchar("lastname", 100)
-    val email = varchar("email", 255).uniqueIndex()
+    val email = varchar("email", 255)
     val password = varchar("password", 255)
     val avatarUrl = text("avatar_url").nullable()
     val phone = varchar("phone", 50).nullable()

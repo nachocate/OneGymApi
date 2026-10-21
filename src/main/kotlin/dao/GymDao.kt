@@ -9,7 +9,7 @@ class GymDao(id: EntityID<Long>) : LongEntity(id) {
     companion object : LongEntityClass<GymDao>(Gyms)
     var name by Gyms.name
     var description by Gyms.description
-    var schedule by Gyms.schedule
+    var localityId by Gyms.locality
     var address by Gyms.address
     var phone by Gyms.phone
     var logoUrl by Gyms.logoUrl

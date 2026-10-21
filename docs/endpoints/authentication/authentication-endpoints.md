@@ -7,6 +7,7 @@ Documentación para iniciar sesión, renovar la sesión y cerrarla.
 - **Base URL:** reemplazar `{BASE_URL}` por la URL del entorno correspondiente.
 - Estos endpoints no requieren header `Authorization`.
 - Enviar `Content-Type: application/json` en todos los requests.
+- El email se compara sin distinguir mayúsculas/minúsculas y se normaliza sin espacios externos.
 - Tras un login o refresh exitoso, guardar el `accessToken` para consumir endpoints protegidos y el nuevo `refreshToken` para renovar la sesión.
 - El access token se utiliza como `Authorization: Bearer <accessToken>`.
 

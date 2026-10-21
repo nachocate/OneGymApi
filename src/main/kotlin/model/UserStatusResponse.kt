@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class UserStatusResponse(
     val gymCount: Int,
+    val systemRoles: List<String>,
     val gyms: List<GymSubscription>
 )
 

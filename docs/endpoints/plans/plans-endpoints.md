@@ -9,7 +9,7 @@ Documentación para administrar planes de entrenamiento asociados a un gimnasio.
 - En `POST` y `PUT`, enviar `Content-Type: application/json`.
 - Los IDs son `Long` autogenerados. No enviar `id` al crear.
 - `gymId` y `planTypeId` deben referenciar recursos existentes.
-- `planRootId` puede ser `null`; si se informa, referencia otro plan y permite modelar una variante o derivación.
+- `planRootId` puede ser `null`; si se informa, referencia otro plan del mismo gimnasio y permite modelar una variante o derivación. No se permiten referencias circulares.
 
 ## Estructura de un plan
 
@@ -91,7 +91,7 @@ No devuelve body. Consultar luego el recurso mediante `GET`.
 ## 4. Actualizar un plan
 
 ```http
-PUT {BASE_URL}/plans/1
+PUT {BASE_URL}/plans/2
 Authorization: Bearer <accessToken>
 Content-Type: application/json
 ```

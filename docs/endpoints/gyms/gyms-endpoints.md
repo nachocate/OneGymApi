@@ -15,7 +15,7 @@ Documentación para la integración del frontend con los recursos de gimnasios.
 
 - Los IDs son números enteros (`Long`) generados por la base de datos. No se debe enviar `id` al crear un gimnasio.
 - Los campos JSON usan `camelCase`.
-- `name` es obligatorio. Los demás campos admiten `null`.
+- `name` y `localityId` son obligatorios. Los demás campos admiten `null`.
 
 ## Estructura de un gimnasio
 
@@ -24,7 +24,7 @@ Documentación para la integración del frontend con los recursos de gimnasios.
 | `id` | number | Solo respuesta | Identificador generado por la API. |
 | `name` | string | Sí | Nombre del gimnasio. Máximo 150 caracteres. |
 | `description` | string \| null | No | Descripción del gimnasio. |
-| `schedule` | string \| null | No | Horarios de atención en formato de texto. |
+| `localityId` | number | Sí | Localidad del gimnasio. A través de la localidad se determina su provincia y país. |
 | `address` | string \| null | No | Dirección. |
 | `phone` | string \| null | No | Teléfono de contacto. |
 | `logoUrl` | string \| null | No | URL del logo. |
@@ -37,7 +37,7 @@ Ejemplo de gimnasio devuelto por la API:
   "id": 1,
   "name": "Forze Gym",
   "description": "Gimnasio de entrenamiento funcional y fuerza.",
-  "schedule": "Lunes a viernes 07:00-22:00; sábados 09:00-14:00",
+  "localityId": 1,
   "address": "Av. Siempre Viva 123",
   "phone": "+54 11 5555-0101",
   "logoUrl": null,
@@ -60,7 +60,7 @@ Authorization: Bearer <accessToken>
     "id": 1,
     "name": "Forze Gym",
     "description": "Gimnasio de entrenamiento funcional y fuerza.",
-    "schedule": "Lunes a viernes 07:00-22:00; sábados 09:00-14:00",
+    "localityId": 1,
     "address": "Av. Siempre Viva 123",
     "phone": "+54 11 5555-0101",
     "logoUrl": null,
@@ -85,7 +85,7 @@ Authorization: Bearer <accessToken>
   "id": 1,
   "name": "Forze Gym",
   "description": "Gimnasio de entrenamiento funcional y fuerza.",
-  "schedule": "Lunes a viernes 07:00-22:00; sábados 09:00-14:00",
+  "localityId": 1,
   "address": "Av. Siempre Viva 123",
   "phone": "+54 11 5555-0101",
   "logoUrl": null,
@@ -100,29 +100,33 @@ Authorization: Bearer <accessToken>
 
 ## 3. Crear un gimnasio
 
+La creación es una operación de plataforma: requiere `SUPER_ADMIN` y debe incluir la suscripción inicial y el primer owner. El contrato atómico y sus ejemplos están documentados en [gym-members-endpoints.md](gym-members-endpoints.md). No usar este endpoint para crear un gimnasio sin owner.
+
 ```http
 POST {BASE_URL}/gyms
 Authorization: Bearer <accessToken>
 Content-Type: application/json
 ```
 
-**Body de ejemplo**
+**Estructura base del gimnasio dentro del body de creación**
 
 ```json
 {
   "name": "Forze Gym",
   "description": "Gimnasio de entrenamiento funcional y fuerza.",
-  "schedule": "Lunes a viernes 07:00-22:00; sábados 09:00-14:00",
+  "localityId": 1,
   "address": "Av. Siempre Viva 123",
   "phone": "+54 11 5555-0101",
   "logoUrl": "https://cdn.ejemplo.com/gyms/forze/logo.png",
-  "bannerUrl": "https://cdn.ejemplo.com/gyms/forze/banner.png"
+  "bannerUrl": "https://cdn.ejemplo.com/gyms/forze/banner.png",
+  "subscription": { "startDate": "2026-10-11" },
+  "ownerUserId": 4
 }
 ```
 
 **Respuesta exitosa — `201 Created`**
 
-Este endpoint no devuelve body. El ID se genera en la base de datos; para obtener el recurso creado se debe consultar luego `GET /gyms` o `GET /gyms/{id}`.
+Devuelve `201 Created` con el gimnasio creado. Se debe enviar `ownerUserId` o `owner`, nunca ambos.
 
 ## 4. Actualizar un gimnasio
 
@@ -140,7 +144,7 @@ Content-Type: application/json
 {
   "name": "Forze Gym Palermo",
   "description": "Entrenamiento funcional, fuerza y movilidad.",
-  "schedule": "Lunes a viernes 06:30-22:30; sábados 09:00-14:00",
+  "localityId": 1,
   "address": "Av. Siempre Viva 123, Palermo",
   "phone": "+54 11 5555-0101",
   "logoUrl": "https://cdn.ejemplo.com/gyms/forze/logo.png",
@@ -154,7 +158,7 @@ Para borrar un valor opcional, enviarlo explícitamente como `null`:
 {
   "name": "Forze Gym Palermo",
   "description": null,
-  "schedule": null,
+  "localityId": 1,
   "address": null,
   "phone": null,
   "logoUrl": null,

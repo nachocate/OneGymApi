@@ -8,7 +8,12 @@ Documentación para administrar la asignación de planes de entrenamiento a usua
 - Todos los endpoints requieren `Authorization: Bearer <accessToken>`.
 - En `POST` y `PUT`, enviar `Content-Type: application/json`.
 - Los IDs son `Long` autogenerados. No enviar `id` al crear.
+- Los bodies de `POST` y `PUT` usan `SaveUserPlanRequest` (`userId`, `planId`); las respuestas usan `UserPlan` e incluyen el `id` generado por el servidor.
 - `userId` y `planId` deben referenciar recursos existentes.
+- Un mismo plan solo puede asignarse una vez a un mismo usuario.
+- El usuario debe tener una membresía activa en el gimnasio propietario del plan; PostgreSQL valida esta regla aunque la operación no provenga de la API.
+- `GET /user-plans` es exclusivo de Super Admin. Un usuario puede consultar una asignación propia; los miembros del gimnasio del plan pueden consultar las asignaciones de sus compañeros activos. Crear, modificar y eliminar requiere rol `COACH`, `ADMIN`, `OWNER` o Super Admin en el gimnasio del plan.
+- No se permite cambiar mediante `PUT` el usuario ni mover la asignación a un plan de otro gimnasio.
 
 ## Estructura de una asignación de plan
 
@@ -58,7 +63,7 @@ Authorization: Bearer <accessToken>
 { "id": 1, "userId": 1, "planId": 1 }
 ```
 
-**Errores:** `400 Bad Request` si el ID no es numérico; `404 Not Found` si la asignación no existe.
+**Errores:** `400 Bad Request` si el ID no es numérico; `403 Forbidden` si no pertenece al gimnasio o no tiene permiso; `404 Not Found` si la asignación no existe.
 
 ## 3. Crear una asignación de plan
 

@@ -6,9 +6,13 @@ import com.concatstudio.onegym.mappers.toModel
 import com.concatstudio.onegym.model.Exercise
 import com.concatstudio.onegym.respository.ExerciseRepository
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
+import org.jetbrains.exposed.v1.core.*
 
 class ExerciseRepositoryImp : ExerciseRepository {
     override fun getExercises() = transaction(Database.connection) { ExerciseDao.all().map(::toModel) }
+    override fun getExercisesAvailableToGym(gymId: Long, limit: Int, offset: Long) = transaction(Database.connection) {
+        ExerciseDao.find { (Exercises.gym eq gymId) or Exercises.gym.isNull() }.orderBy(Exercises.id to SortOrder.ASC).drop(offset.toInt()).take(limit).map(::toModel)
+    }
     override fun getExerciseById(id: Long) = transaction(Database.connection) { ExerciseDao.findById(id)?.let(::toModel) }
     override fun updateExercise(exerciseId: Long, exercise: Exercise) = transaction(Database.connection) { ExerciseDao.findById(exerciseId)?.apply { name = exercise.name; description = exercise.description; videoUrl = exercise.videoUrl; imageUrl = exercise.imageUrl; gymId = exercise.gymId?.let(::gymRef); isVisibleGlobal = exercise.isVisibleGlobal }; Unit }
     override fun createExercise(exercise: Exercise) = transaction(Database.connection) { ExerciseDao.new { name = exercise.name; description = exercise.description; videoUrl = exercise.videoUrl; imageUrl = exercise.imageUrl; gymId = exercise.gymId?.let(::gymRef); isVisibleGlobal = exercise.isVisibleGlobal }; Unit }

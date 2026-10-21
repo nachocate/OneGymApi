@@ -11,6 +11,14 @@ import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import java.time.LocalDate
 
 class UserStatusRepositoryImp : UserStatusRepository {
+    override fun getSystemRoleNames(userId: Long): List<String> = transaction(Database.connection) {
+        UserSystemRoles
+            .innerJoin(SystemRoles)
+            .selectAll()
+            .where { UserSystemRoles.user eq userId }
+            .map { it[SystemRoles.name] }
+    }
+
     override fun getActiveGymSubscriptions(userId: Long): List<GymSubscription> = transaction(Database.connection) {
         val today = LocalDate.now()
         UserGyms
@@ -28,7 +36,7 @@ class UserStatusRepositoryImp : UserStatusRepository {
                         id = row[Gyms.id].value,
                         name = row[Gyms.name],
                         description = row[Gyms.description],
-                        schedule = row[Gyms.schedule],
+                        localityId = row[Gyms.locality].value,
                         address = row[Gyms.address],
                         phone = row[Gyms.phone],
                         logoUrl = row[Gyms.logoUrl],

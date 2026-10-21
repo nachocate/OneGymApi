@@ -8,6 +8,7 @@ Documentación para administrar las categorías de planes de entrenamiento.
 - Todos los endpoints requieren `Authorization: Bearer <accessToken>`.
 - En `POST` y `PUT`, enviar `Content-Type: application/json`.
 - Los IDs son `Long` autogenerados. El nombre del tipo debe ser único.
+- Las lecturas están disponibles para cualquier usuario autenticado. Crear, modificar o eliminar tipos es exclusivo de Super Admin.
 
 ## Estructura de un tipo de plan
 

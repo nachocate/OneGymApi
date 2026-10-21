@@ -20,13 +20,14 @@ Authorization: Bearer <accessToken>
 ```json
 {
   "gymCount": 1,
+  "systemRoles": ["SUPER_ADMIN"],
   "gyms": [
     {
       "gym": {
         "id": 1,
         "name": "Forze Gym",
         "description": "Gimnasio de entrenamiento funcional y fuerza.",
-        "schedule": "Lunes a viernes 07:00-22:00",
+        "localityId": 1,
         "address": "Av. Siempre Viva 123",
         "phone": "+54 11 5555-0101",
         "logoUrl": null,
@@ -34,7 +35,7 @@ Authorization: Bearer <accessToken>
       },
       "role": {
         "id": 1,
-        "name": "Alumno"
+        "name": "MEMBER"
       }
     }
   ]
@@ -44,6 +45,7 @@ Authorization: Bearer <accessToken>
 | Campo | Tipo | Descripción |
 | --- | --- | --- |
 | `gymCount` | number | Cantidad de gimnasios con membresía activa. |
+| `systemRoles` | array de string | Roles globales del usuario. Actualmente puede incluir `SUPER_ADMIN`. |
 | `gyms` | array | Membresías activas del usuario. Puede ser `[]`. |
 | `gyms[].gym` | object | Datos básicos del gimnasio. |
 | `gyms[].role` | object | Rol del usuario en ese gimnasio. |
@@ -53,6 +55,7 @@ Authorization: Bearer <accessToken>
 ```json
 {
   "gymCount": 0,
+  "systemRoles": [],
   "gyms": []
 }
 ```

@@ -8,8 +8,10 @@ Documentación para registrar y consultar el estado activo de un plan asignado a
 - Todos los endpoints requieren `Authorization: Bearer <accessToken>`.
 - En `POST` y `PUT`, enviar `Content-Type: application/json`.
 - Los IDs son `Long` autogenerados. No enviar `id` al crear.
-- `userPlanId` debe referenciar una asignación de plan existente. Si se informan, `activeWeekId` y `activeDayId` deben referenciar los recursos correspondientes.
+- Los bodies de `POST` y `PUT` usan `SaveCurrentPlanActivityRequest` y no aceptan un `id`; las respuestas incluyen el identificador generado por el servidor.
+- `userPlanId` debe referenciar una asignación de plan existente. Si se informan, `activeWeekId` y `activeDayId` deben pertenecer a ese mismo plan; si ambos están presentes, el día debe pertenecer a la semana indicada. Solo puede existir una actividad con `isActive: true` por asignación de plan.
 - `date` debe usar formato ISO-8601 con zona horaria, por ejemplo `2026-10-09T12:00:00Z`.
+- `GET /current-plan-activities` es exclusivo de Super Admin. La lectura individual se permite al usuario titular y a miembros del gimnasio del plan. Crear, modificar y eliminar requiere `COACH`, `ADMIN`, `OWNER` o Super Admin en ese gimnasio; no se permite mover la actividad a otro gimnasio.
 
 ## Estructura de una actividad de plan
 
@@ -65,7 +67,7 @@ Authorization: Bearer <accessToken>
 
 **Respuesta — `200 OK`**: un objeto con la estructura anterior.
 
-**Errores:** `400 Bad Request` si el ID no es numérico; `404 Not Found` si la actividad no existe.
+**Errores:** `400 Bad Request` si el ID no es numérico; `403 Forbidden` si no tiene acceso al usuario o al gimnasio; `404 Not Found` si la actividad no existe.
 
 ## 3. Crear una actividad de plan
 

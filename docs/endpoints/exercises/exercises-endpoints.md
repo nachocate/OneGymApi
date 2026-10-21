@@ -9,6 +9,7 @@ Documentación para administrar el catálogo de ejercicios globales o propios de
 - En `POST` y `PUT`, enviar `Content-Type: application/json`.
 - Los IDs son `Long` autogenerados. No enviar `id` al crear.
 - Un ejercicio global debe usar `gymId: null` e `isVisibleGlobal: true`.
+- La API y PostgreSQL rechazan la combinación `gymId: null` con `isVisibleGlobal: false`.
 - Un ejercicio específico de un gimnasio debe informar el `gymId` correspondiente. `isVisibleGlobal` controla si también puede verse globalmente.
 
 ## Estructura de un ejercicio

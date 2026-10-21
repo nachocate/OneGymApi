@@ -6,10 +6,14 @@ import com.concatstudio.onegym.mappers.toModel
 import com.concatstudio.onegym.model.GymCoach
 import com.concatstudio.onegym.respository.GymCoachRepository
 import java.time.LocalDate
+import org.jetbrains.exposed.v1.core.*
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 
 class GymCoachRepositoryImp : GymCoachRepository {
     override fun getGymCoaches() = transaction(Database.connection) { GymCoachDao.all().map(::toModel) }
+    override fun getGymCoachesByGymId(gymId: Long, limit: Int, offset: Long) = transaction(Database.connection) {
+        GymCoachDao.find { GymCoaches.gym eq gymId }.orderBy(GymCoaches.id to SortOrder.ASC).drop(offset.toInt()).take(limit).map(::toModel)
+    }
     override fun getGymCoachById(id: Long) = transaction(Database.connection) { GymCoachDao.findById(id)?.let(::toModel) }
 
     override fun createGymCoach(gymCoach: GymCoach) = transaction(Database.connection) {

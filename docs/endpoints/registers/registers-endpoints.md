@@ -8,7 +8,9 @@ Documentación para registrar el peso utilizado por un usuario al realizar un ej
 - Todos los endpoints requieren `Authorization: Bearer <accessToken>`.
 - En `POST` y `PUT`, enviar `Content-Type: application/json`.
 - Los IDs son `Long` autogenerados. No enviar `id` al crear.
-- `userPlanId`, `exerciseId` y `blockId` deben referenciar recursos existentes.
+- Los bodies de `POST` y `PUT` usan `SaveRegisterRequest` y no aceptan un `id`; las respuestas incluyen el identificador generado por el servidor.
+- `userPlanId`, `exerciseId` y `blockId` deben referenciar recursos existentes. El bloque debe pertenecer al plan asignado por `userPlanId` y el ejercicio debe estar configurado dentro de ese bloque.
+- `GET /registers` es exclusivo de Super Admin. La lectura individual se permite al usuario titular y a miembros del gimnasio del plan. Crear, modificar y eliminar requiere `COACH`, `ADMIN`, `OWNER` o Super Admin en ese gimnasio; no se permite mover el registro a otro gimnasio.
 
 ## Estructura de un registro
 
@@ -71,7 +73,7 @@ Authorization: Bearer <accessToken>
 }
 ```
 
-**Errores:** `400 Bad Request` si el ID no es numérico; `404 Not Found` si el registro no existe.
+**Errores:** `400 Bad Request` si el ID no es numérico; `403 Forbidden` si no tiene acceso al usuario o al gimnasio; `404 Not Found` si el registro no existe.
 
 ## 3. Crear un registro
 

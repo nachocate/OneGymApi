@@ -10,6 +10,7 @@ Documentación para asignar entrenadores a un gimnasio y definir su tipo de entr
 - Los IDs son `Long` autogenerados. No enviar `id` al crear.
 - `userId`, `gymId` y `coachTypeId` deben referenciar recursos existentes.
 - Las fechas usan formato `YYYY-MM-DD`. Si se informa `endDate`, debe ser igual o posterior a `startDate`.
+- `GET /gym-coaches` es exclusivo de Super Admin; la lectura individual requiere pertenecer al gimnasio o ser Super Admin. Crear, modificar y eliminar una asignación requiere `ADMIN`, `OWNER` o Super Admin en el gimnasio y no permite trasladarla a otro gimnasio mediante `PUT`.
 
 ## Estructura de una asignación
 

@@ -15,6 +15,7 @@ Documentación para administrar evaluaciones, como una evaluación inicial o con
 | Campo | Tipo | Obligatorio | Descripción |
 | --- | --- | --- | --- |
 | `id` | number | Solo respuesta | Identificador generado por la API. |
+| `userId` | number | Sí | Usuario al que pertenece la evaluación. |
 | `name` | string | Sí | Nombre de la evaluación. |
 | `description` | string \| null | Sí | Detalle opcional de la evaluación. |
 | `creationDate` | string | Sí | Fecha y hora de creación en formato ISO-8601. |
@@ -23,6 +24,7 @@ Documentación para administrar evaluaciones, como una evaluación inicial o con
 
 ```json
 {
+  "userId": 1,
   "name": "Evaluación inicial",
   "description": "Mediciones de ingreso del alumno.",
   "creationDate": "2026-10-09T12:00:00Z"
@@ -34,6 +36,7 @@ Documentación para administrar evaluaciones, como una evaluación inicial o con
 ```json
 {
   "id": 1,
+  "userId": 1,
   "name": "Evaluación inicial",
   "description": "Mediciones de ingreso del alumno.",
   "creationDate": "2026-10-09T12:00:00Z"
@@ -43,11 +46,11 @@ Documentación para administrar evaluaciones, como una evaluación inicial o con
 ## 1. Listar evaluaciones
 
 ```http
-GET {BASE_URL}/evaluations
+GET {BASE_URL}/evaluations?userId=1
 Authorization: Bearer <accessToken>
 ```
 
-**Respuesta — `200 OK`**: un arreglo de objetos con la estructura anterior.
+**Respuesta — `200 OK`**: evaluaciones del usuario indicado. El propio usuario o cualquier persona que comparta gimnasio puede leerlas; crear, modificar o eliminar requiere `COACH` o superior compartiendo gimnasio.
 
 ## 2. Obtener una evaluación por ID
 
@@ -86,6 +89,7 @@ Content-Type: application/json
 
 ```json
 {
+  "userId": 1,
   "name": "Evaluación trimestral",
   "description": "Control de progreso físico.",
   "creationDate": "2026-10-09T12:00:00Z"
@@ -94,7 +98,7 @@ Content-Type: application/json
 
 **Respuesta — `204 No Content`**
 
-**Errores:** `400 Bad Request` si el ID no es numérico; `404 Not Found` si la evaluación no existe.
+**Errores:** `400 Bad Request` si el ID no es numérico; `403 Forbidden` si no puede gestionar los datos de entrenamiento de ese usuario; `404 Not Found` si la evaluación no existe.
 
 ## 5. Eliminar una evaluación
 
@@ -105,4 +109,4 @@ Authorization: Bearer <accessToken>
 
 **Respuesta — `204 No Content`**
 
-No devuelve body. Actualmente responde `204` aun si el ID no existía.
+No devuelve body. Devuelve `404 Not Found` si la evaluación no existe y `403 Forbidden` si no puede gestionar los datos de entrenamiento de ese usuario.

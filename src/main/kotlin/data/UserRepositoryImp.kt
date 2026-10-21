@@ -4,11 +4,13 @@ import com.concatstudio.onegym.dao.UserDao
 import com.concatstudio.onegym.dao.Users
 import com.concatstudio.onegym.database.Database
 import com.concatstudio.onegym.model.User
+import com.concatstudio.onegym.model.UpdateUserProfileRequest
 import com.concatstudio.onegym.respository.UserRepository
 import com.concatstudio.onegym.security.PasswordService
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import org.jetbrains.exposed.v1.core.*
 import com.concatstudio.onegym.mappers.toModel
+import java.util.Locale
 
 class UserRepositoryImp : UserRepository {
     override fun getUsers(): List<User> {
@@ -25,7 +27,7 @@ class UserRepositoryImp : UserRepository {
 
     override fun getUserByEmail(email: String): User? {
         return transaction(Database.connection) {
-            UserDao.find { Users.email eq email }.firstOrNull()?.let(::toModel)
+            UserDao.find { Users.email eq normalizedEmail(email) }.firstOrNull()?.let(::toModel)
         }
     }
 
@@ -34,11 +36,24 @@ class UserRepositoryImp : UserRepository {
             UserDao.findById(userId)?.apply {
                 firstName = user.firstName
                 lastName = user.lastName
-                email = user.email
+                email = normalizedEmail(user.email)
                 password = PasswordService.encode(user.password)
                 avatarUrl = user.avatarUrl
                 phone = user.phone
                 address = user.address
+            }
+        }
+    }
+
+    override fun updateUserProfile(userId: Long, profile: UpdateUserProfileRequest) {
+        transaction(Database.connection) {
+            UserDao.findById(userId)?.apply {
+                firstName = profile.firstName
+                lastName = profile.lastName
+                email = normalizedEmail(profile.email)
+                avatarUrl = profile.avatarUrl
+                phone = profile.phone
+                address = profile.address
             }
         }
     }
@@ -54,7 +69,7 @@ class UserRepositoryImp : UserRepository {
             UserDao.new {
                 firstName = user.firstName
                 lastName = user.lastName
-                email = user.email
+                email = normalizedEmail(user.email)
                 password = PasswordService.encode(user.password)
                 avatarUrl = user.avatarUrl
                 phone = user.phone
@@ -80,3 +95,5 @@ class UserRepositoryImp : UserRepository {
 
 
 }
+
+private fun normalizedEmail(email: String): String = email.trim().lowercase(Locale.ROOT)

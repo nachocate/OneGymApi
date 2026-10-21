@@ -10,9 +10,13 @@ BEGIN;
 -- ============================================================
 
 INSERT INTO user_roles (id, name) OVERRIDING SYSTEM VALUE VALUES
-    (1, 'User'),
-    (2, 'Admin'),
-    (3, 'SuperAdmin');
+    (1, 'MEMBER'),
+    (2, 'COACH'),
+    (3, 'ADMIN'),
+    (4, 'OWNER');
+
+INSERT INTO system_roles (id, name) OVERRIDING SYSTEM VALUE VALUES
+    (1, 'SUPER_ADMIN');
 
 -- ============================================================
 -- COACH TYPES
@@ -42,27 +46,54 @@ OVERRIDING SYSTEM VALUE VALUES
     (10, 'nicolas@onegym.test', '$2a$12$lRjI71wrqakSjaVFLQZSZ.xmq2.wn6LbBGQgJWSGndpobIG0ygwl6', NULL, 'Nicolas', 'Silva', '+54 11 5555-0110', 'Av. Siempre Viva 132');
 
 -- ============================================================
--- GYM
+-- GEOGRAPHIC CATALOGS AND GYM
 -- ============================================================
 
-INSERT INTO gyms (id, name, description, schedule, address, phone, logo_url, banner_url)
-OVERRIDING SYSTEM VALUE VALUES
-    (1, 'Forze Gym', 'Gimnasio de entrenamiento funcional y fuerza.', 'Lunes a viernes 07:00-22:00; sábados 09:00-14:00', 'Av. Siempre Viva 123', '+54 11 5555-0101', NULL, NULL);
+INSERT INTO countries (id, name, iso_code) OVERRIDING SYSTEM VALUE VALUES
+    (1, 'Argentina', 'AR');
 
-INSERT INTO user_gyms (id, id_user, id_gym, id_user_rol, start_date, end_date)
+INSERT INTO provinces (id, country_id, name) OVERRIDING SYSTEM VALUE VALUES
+    (1, 1, 'Buenos Aires');
+
+INSERT INTO localities (id, province_id, name) OVERRIDING SYSTEM VALUE VALUES
+    (1, 1, 'La Plata');
+
+INSERT INTO gyms (id, name, description, locality_id, address, phone, logo_url, banner_url)
+OVERRIDING SYSTEM VALUE VALUES
+    (1, 'Forze Gym', 'Gimnasio de entrenamiento funcional y fuerza.', 1, 'Av. Siempre Viva 123', '+54 11 5555-0101', NULL, NULL);
+
+-- Informational only; these values do not restrict API operations.
+INSERT INTO gym_business_hours (id, gym_id, day_of_week, opens_at, closes_at)
+OVERRIDING SYSTEM VALUE VALUES
+    (1, 1, 1, '07:00', '22:00'),
+    (2, 1, 2, '07:00', '22:00'),
+    (3, 1, 3, '07:00', '22:00'),
+    (4, 1, 4, '07:00', '22:00'),
+    (5, 1, 5, '07:00', '22:00'),
+    (6, 1, 6, '09:00', '14:00');
+
+INSERT INTO gym_subscriptions (id, gym_id, start_date, expires_at, is_active)
+OVERRIDING SYSTEM VALUE VALUES
+    (1, 1, CURRENT_DATE - 365, NULL, TRUE);
+
+INSERT INTO user_gyms (id, user_id, gym_id, role_id, start_date, end_date)
 OVERRIDING SYSTEM VALUE VALUES
     (1, 1, 1, 1, CURRENT_DATE - 90, NULL),
     (2, 2, 1, 1, CURRENT_DATE - 60, NULL),
     (3, 3, 1, 1, CURRENT_DATE - 45, NULL),
-    (4, 4, 1, 3, CURRENT_DATE - 365, NULL),
-    (5, 5, 1, 2, CURRENT_DATE - 300, NULL),
+    (4, 4, 1, 4, CURRENT_DATE - 365, NULL),
+    (5, 5, 1, 3, CURRENT_DATE - 300, NULL),
     (6, 6, 1, 1, CURRENT_DATE - 240, NULL),
     (7, 7, 1, 1, CURRENT_DATE - 180, NULL),
     (8, 8, 1, 1, CURRENT_DATE - 150, NULL),
     (9, 9, 1, 1, CURRENT_DATE - 120, NULL),
     (10, 10, 1, 1, CURRENT_DATE - 90, NULL);
 
-INSERT INTO gym_coaches (id, id_user, id_gym, id_coach_type, start_date, end_date)
+INSERT INTO user_system_roles (id, user_id, system_role_id)
+OVERRIDING SYSTEM VALUE VALUES
+    (1, 4, 1);
+
+INSERT INTO gym_coaches (id, user_id, gym_id, coach_type_id, start_date, end_date)
 OVERRIDING SYSTEM VALUE VALUES
     (1, 2, 1, 1, CURRENT_DATE - 180, NULL),
     (2, 3, 1, 2, CURRENT_DATE - 120, NULL),
@@ -78,7 +109,7 @@ OVERRIDING SYSTEM VALUE VALUES
 -- NEWS
 -- ============================================================
 
-INSERT INTO news (id, id_gym, title, description, image_url, "date")
+INSERT INTO news (id, gym_id, title, description, image_url, "date")
 OVERRIDING SYSTEM VALUE VALUES
     (1, 1, 'Nueva zona de peso libre', 'Incorporamos nuevas barras, discos y mancuernas para tus entrenamientos.', NULL, CURRENT_TIMESTAMP - INTERVAL '12 days'),
     (2, 1, 'Clase especial de movilidad', 'El próximo sábado habrá una clase abierta de movilidad y recuperación.', NULL, CURRENT_TIMESTAMP - INTERVAL '9 days'),
@@ -90,7 +121,7 @@ OVERRIDING SYSTEM VALUE VALUES
 -- EXERCISES
 -- ============================================================
 
-INSERT INTO exercises (id, name, description, video_url, image_url, id_gym, is_visible_global)
+INSERT INTO exercises (id, name, description, video_url, image_url, gym_id, is_visible_global)
 OVERRIDING SYSTEM VALUE VALUES
     (1, 'Sentadilla con barra', 'Sentadilla trasera con barra.', NULL, NULL, NULL, TRUE),
     (2, 'Press de banca', 'Press horizontal con barra.', NULL, NULL, NULL, TRUE),
@@ -124,7 +155,7 @@ INSERT INTO plan_types (id, name) OVERRIDING SYSTEM VALUE VALUES
     (1, 'Generica'),
     (2, 'Personalizada');
 
-INSERT INTO plans (id, name, id_gym, id_plan_type, id_plan_root)
+INSERT INTO plans (id, name, gym_id, plan_type_id, plan_root_id)
 OVERRIDING SYSTEM VALUE VALUES
     (1, 'Sofia - Fuerza inicial', 1, 1, NULL),
     (2, 'Sofia - Progresion personal', 1, 2, NULL),
@@ -147,7 +178,7 @@ OVERRIDING SYSTEM VALUE VALUES
     (19, 'Nicolas - Fuerza inicial', 1, 1, NULL),
     (20, 'Nicolas - Progresion personal', 1, 2, NULL);
 
-INSERT INTO user_plans (id, id_user, id_plan) OVERRIDING SYSTEM VALUE VALUES
+INSERT INTO user_plans (id, user_id, plan_id) OVERRIDING SYSTEM VALUE VALUES
     (1, 1, 1),
     (2, 1, 2),
     (3, 2, 3),
@@ -191,19 +222,19 @@ BEGIN
         FOR week_number IN 1..2 LOOP
             week_id_value := (plan_id_value - 1) * 2 + week_number;
 
-            INSERT INTO weeks (id, number, id_plan)
+                INSERT INTO weeks (id, number, plan_id)
             OVERRIDING SYSTEM VALUE VALUES (week_id_value, week_number, plan_id_value);
 
             FOR day_number IN 1..2 LOOP
                 day_id_value := (week_id_value - 1) * 2 + day_number;
 
-                INSERT INTO days (id, number, id_week)
+                INSERT INTO days (id, number, week_id)
                 OVERRIDING SYSTEM VALUE VALUES (day_id_value, day_number, week_id_value);
 
                 FOR block_position IN 0..1 LOOP
                     block_id_value := (day_id_value - 1) * 2 + block_position + 1;
 
-                    INSERT INTO blocks (id, position, name, id_day, laps)
+                    INSERT INTO blocks (id, position, name, day_id, laps)
                     OVERRIDING SYSTEM VALUE VALUES (
                         block_id_value,
                         block_position,
@@ -217,7 +248,7 @@ BEGIN
 
                         IF exercise_position = 0 THEN
                             INSERT INTO block_exercises (
-                                id, id_block, id_exercise, id_quantity_type,
+                                id, block_id, exercise_id, quantity_type_id,
                                 position, repetitions, quantity
                             ) OVERRIDING SYSTEM VALUE VALUES (
                                 (block_id_value - 1) * 2 + exercise_position + 1,
@@ -230,7 +261,7 @@ BEGIN
                             );
                         ELSE
                             INSERT INTO block_exercises (
-                                id, id_block, id_exercise, id_quantity_type,
+                                id, block_id, exercise_id, quantity_type_id,
                                 position, repetitions, quantity
                             ) OVERRIDING SYSTEM VALUE VALUES (
                                 (block_id_value - 1) * 2 + exercise_position + 1,
@@ -254,7 +285,7 @@ END $$;
 -- ============================================================
 
 INSERT INTO current_plan_activities
-    (id, "date", id_user_plan, id_week_active, id_day_active, is_active)
+    (id, "date", user_plan_id, active_week_id, active_day_id, is_active)
 OVERRIDING SYSTEM VALUE VALUES
     (1, CURRENT_TIMESTAMP, 1, 1, 1, TRUE),
     (2, CURRENT_TIMESTAMP, 3, 5, 9, TRUE),
@@ -271,44 +302,53 @@ OVERRIDING SYSTEM VALUE VALUES
 -- PROGRAMMED WEIGHTS / REGISTERS
 -- ============================================================
 
-INSERT INTO registers (id, id_user_plan, id_exercise, id_block, weight)
+INSERT INTO registers (id, user_plan_id, exercise_id, block_id, weight)
 OVERRIDING SYSTEM VALUE VALUES
     (1, 1, 1, 1, 40.00),
-    (2, 2, 2, 17, 45.00),
-    (3, 3, 3, 33, 50.00),
-    (4, 4, 4, 49, 55.00),
-    (5, 5, 5, 9, 60.00),
-    (6, 6, 6, 25, 65.00),
-    (7, 7, 7, 41, 70.00),
+    (2, 2, 9, 9, 45.00),
+    (3, 3, 7, 17, 50.00),
+    (4, 4, 5, 25, 55.00),
+    (5, 5, 3, 33, 60.00),
+    (6, 6, 1, 41, 65.00),
+    (7, 7, 9, 49, 70.00),
     (8, 8, 8, 57, 75.00);
 
 -- ============================================================
 -- USER TESTS
 -- ============================================================
 
-INSERT INTO evaluations (id, name, description, creation_date)
+INSERT INTO evaluations (id, user_id, name, description, creation_date)
 OVERRIDING SYSTEM VALUE VALUES
-    (1, 'Evaluacion inicial', 'Mediciones de ingreso de los usuarios.', CURRENT_TIMESTAMP - INTERVAL '30 days'),
-    (2, 'Evaluacion de seguimiento', 'Mediciones para controlar el progreso.', CURRENT_TIMESTAMP - INTERVAL '10 days');
+    (1, 1, 'Evaluacion inicial', 'Mediciones de ingreso de Sofia.', CURRENT_TIMESTAMP - INTERVAL '30 days'),
+    (2, 2, 'Evaluacion inicial', 'Mediciones de ingreso de Lucas.', CURRENT_TIMESTAMP - INTERVAL '25 days'),
+    (3, 3, 'Evaluacion de seguimiento', 'Mediciones de seguimiento de Valentina.', CURRENT_TIMESTAMP - INTERVAL '10 days'),
+    (4, 4, 'Evaluacion de seguimiento', 'Mediciones de seguimiento de Martin.', CURRENT_TIMESTAMP - INTERVAL '8 days');
 
 INSERT INTO user_tests (
-    id, id_exercise, id_user, id_evaluation, id_quantity_type,
+    id, exercise_id, user_id, evaluation_id, quantity_type_id,
     repetitions, quantity, "date", description
 ) OVERRIDING SYSTEM VALUE VALUES
     (1, 1, 1, 1, 5, 5, 60.00, CURRENT_TIMESTAMP - INTERVAL '30 days', 'Test inicial de sentadilla.'),
     (2, 2, 1, 1, 5, 5, 40.00, CURRENT_TIMESTAMP - INTERVAL '25 days', 'Test inicial de press de banca.'),
-    (3, 3, 2, 1, 5, 5, 80.00, CURRENT_TIMESTAMP - INTERVAL '20 days', 'Test inicial de peso muerto.'),
-    (4, 4, 2, 1, NULL, 8, NULL, CURRENT_TIMESTAMP - INTERVAL '15 days', 'Cantidad maxima de dominadas.'),
-    (5, 5, 3, 2, NULL, 20, NULL, CURRENT_TIMESTAMP - INTERVAL '12 days', 'Test de burpees en un minuto.'),
-    (6, 6, 3, 2, 5, 10, 20.00, CURRENT_TIMESTAMP - INTERVAL '10 days', 'Test de zancadas con carga.'),
-    (7, 9, 4, 2, 5, 10, 16.00, CURRENT_TIMESTAMP - INTERVAL '8 days', 'Test de kettlebell swing.'),
-    (8, 10, 4, 2, 4, NULL, 5.00, CURRENT_TIMESTAMP - INTERVAL '5 days', 'Test de carrera de cinco kilometros.');
+    (3, 3, 2, 2, 5, 5, 80.00, CURRENT_TIMESTAMP - INTERVAL '20 days', 'Test inicial de peso muerto.'),
+    (4, 4, 2, 2, NULL, 8, NULL, CURRENT_TIMESTAMP - INTERVAL '15 days', 'Cantidad maxima de dominadas.'),
+    (5, 5, 3, 3, NULL, 20, NULL, CURRENT_TIMESTAMP - INTERVAL '12 days', 'Test de burpees en un minuto.'),
+    (6, 6, 3, 3, 5, 10, 20.00, CURRENT_TIMESTAMP - INTERVAL '10 days', 'Test de zancadas con carga.'),
+    (7, 9, 4, 4, 5, 10, 16.00, CURRENT_TIMESTAMP - INTERVAL '8 days', 'Test de kettlebell swing.'),
+    (8, 10, 4, 4, 4, NULL, 5.00, CURRENT_TIMESTAMP - INTERVAL '5 days', 'Test de carrera de cinco kilometros.');
 
 -- Keep identity sequences ahead of the explicit test IDs.
 SELECT setval(pg_get_serial_sequence('user_roles', 'id'), COALESCE((SELECT MAX(id) FROM user_roles), 1), true);
+SELECT setval(pg_get_serial_sequence('system_roles', 'id'), COALESCE((SELECT MAX(id) FROM system_roles), 1), true);
+SELECT setval(pg_get_serial_sequence('user_system_roles', 'id'), COALESCE((SELECT MAX(id) FROM user_system_roles), 1), true);
 SELECT setval(pg_get_serial_sequence('coach_types', 'id'), COALESCE((SELECT MAX(id) FROM coach_types), 1), true);
 SELECT setval(pg_get_serial_sequence('users', 'id'), COALESCE((SELECT MAX(id) FROM users), 1), true);
+SELECT setval(pg_get_serial_sequence('countries', 'id'), COALESCE((SELECT MAX(id) FROM countries), 1), true);
+SELECT setval(pg_get_serial_sequence('provinces', 'id'), COALESCE((SELECT MAX(id) FROM provinces), 1), true);
+SELECT setval(pg_get_serial_sequence('localities', 'id'), COALESCE((SELECT MAX(id) FROM localities), 1), true);
 SELECT setval(pg_get_serial_sequence('gyms', 'id'), COALESCE((SELECT MAX(id) FROM gyms), 1), true);
+SELECT setval(pg_get_serial_sequence('gym_business_hours', 'id'), COALESCE((SELECT MAX(id) FROM gym_business_hours), 1), true);
+SELECT setval(pg_get_serial_sequence('gym_subscriptions', 'id'), COALESCE((SELECT MAX(id) FROM gym_subscriptions), 1), true);
 SELECT setval(pg_get_serial_sequence('user_gyms', 'id'), COALESCE((SELECT MAX(id) FROM user_gyms), 1), true);
 SELECT setval(pg_get_serial_sequence('gym_coaches', 'id'), COALESCE((SELECT MAX(id) FROM gym_coaches), 1), true);
 SELECT setval(pg_get_serial_sequence('news', 'id'), COALESCE((SELECT MAX(id) FROM news), 1), true);

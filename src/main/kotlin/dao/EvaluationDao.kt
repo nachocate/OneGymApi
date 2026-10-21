@@ -8,6 +8,7 @@ import org.jetbrains.exposed.v1.dao.LongEntityClass
 
 class EvaluationDao(id: EntityID<Long>) : LongEntity(id) {
     companion object : LongEntityClass<EvaluationDao>(Evaluations)
+    var userId by Evaluations.user
     var name by Evaluations.name
     var description by Evaluations.description
     var creationDate: OffsetDateTime by Evaluations.creationDate

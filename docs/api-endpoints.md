@@ -1,6 +1,6 @@
 # OneGym API — documentación de endpoints
 
-Guía de integración para frontend basada en las rutas actualmente declaradas en la API.
+Guía de integración para frontend basada en las rutas actualmente declaradas en la API. Para el equipo del dashboard administrativo, consultar la [guía de integración del dashboard](frontend-dashboard-guide.md). Para la app móvil de miembros Kotlin Multiplatform/Compose Multiplatform, consultar la [guía de consumo CMP](frontend-cmp-integration-guide.md).
 
 ## Convenciones generales
 
@@ -9,14 +9,15 @@ Guía de integración para frontend basada en las rutas actualmente declaradas e
 
   ```http
   Authorization: Bearer <accessToken>
-  Content-Type: application/json
   ```
 
+  En `POST` y `PUT` con body JSON, agregar también `Content-Type: application/json`.
+
 - Los identificadores son `Long` autogenerados. En los `POST` no enviar `id`.
-- Todos los `POST` de recursos responden `201 Created` **sin body**. Luego consultar el recurso mediante un `GET`.
+- Los `POST` de CRUD estándar responden `201 Created` **sin body**. `POST /gyms` y los endpoints de alta de miembros responden además el recurso creado; consultar la documentación de cada endpoint.
 - Todos los `PUT` y `DELETE` de recursos responden `204 No Content` **sin body**.
 - Un `GET /recurso/{id}` inexistente responde `404`; un `id` no numérico responde `400`.
-- Los `DELETE /recurso/{id}` son idempotentes: responden `204` aunque el ID no exista.
+- La semántica de `DELETE` depende del recurso: algunas rutas son idempotentes y otras devuelven `404` si no existe. Consultar la documentación de cada endpoint.
 - Los `PUT` son actualizaciones completas: enviar todos los campos requeridos del objeto. El `id` del body se ignora; prevalece el ID de la URL.
 - Las fechas `date` usan ISO-8601 con zona horaria, por ejemplo `2026-10-09T12:00:00Z`. Las fechas de membresías y entrenadores usan `YYYY-MM-DD`.
 
@@ -30,6 +31,7 @@ Guía de integración para frontend basada en las rutas actualmente declaradas e
 | Autenticación | `POST /login`, `POST /auth/refresh`, `POST /auth/logout` |
 | Sesión del usuario | `GET /profile/me`, `GET /status` |
 | Información del gimnasio | `GET /{gymId}/home`, `GET /{gymId}/news`, `GET /plan/{gymId}/me` |
+| Lecturas administrativas por gym | `GET /gyms/{gymId}/members`, `/coaches`, `/business-hours`, `/plans`, `/exercises` |
 | CRUD | Usuarios, gimnasios, membresías, entrenadores, contenido, planes y evaluaciones |
 
 ## Endpoints públicos
@@ -164,19 +166,20 @@ Devuelve las membresías activas del usuario autenticado y su rol en cada gimnas
 ```json
 {
   "gymCount": 1,
+  "systemRoles": ["SUPER_ADMIN"],
   "gyms": [
     {
       "gym": {
         "id": 1,
         "name": "Forze Gym",
         "description": "Gimnasio de entrenamiento funcional y fuerza.",
-        "schedule": "Lunes a viernes 07:00-22:00",
+        "localityId": 1,
         "address": "Av. Siempre Viva 123",
         "phone": "+54 11 5555-0101",
         "logoUrl": null,
         "bannerUrl": null
       },
-      "role": { "id": 1, "name": "Alumno" }
+      "role": { "id": 1, "name": "MEMBER" }
     }
   ]
 }
@@ -200,7 +203,7 @@ Ejemplo: `GET /1/home`.
     "id": 1,
     "name": "Forze Gym",
     "description": "Gimnasio de entrenamiento funcional y fuerza.",
-    "schedule": "Lunes a viernes 07:00-22:00",
+    "localityId": 1,
     "address": "Av. Siempre Viva 123",
     "phone": "+54 11 5555-0101",
     "logoUrl": null,
@@ -321,7 +324,7 @@ El body de creación que se indica para cada recurso también es el body de actu
 
 La documentación detallada se encuentra en [users-endpoints.md](endpoints/users/users-endpoints.md).
 
-**Body para `POST /users` o `PUT /users/{id}`**
+**Body para `POST /users`**
 
 ```json
 {
@@ -349,7 +352,7 @@ La documentación detallada se encuentra en [users-endpoints.md](endpoints/users
 }
 ```
 
-Las respuestas no exponen `password`. Al actualizar un usuario se debe enviar una contraseña válida: se vuelve a guardar codificada.
+Las respuestas no exponen `password`. `PUT /users/{id}` actualiza el perfil sin contraseña; el cambio de contraseña usa su endpoint específico.
 
 #### `PUT /users/{id}/password`
 
@@ -367,6 +370,7 @@ Las respuestas no exponen `password`. Al actualizar un usuario se debe enviar un
 ### Gimnasios — `/gyms`
 
 La documentación detallada se encuentra en [gyms-endpoints.md](endpoints/gyms/gyms-endpoints.md).
+La creación atómica de gimnasios y membresías se documenta en [gym-members-endpoints.md](endpoints/gyms/gym-members-endpoints.md).
 
 **Body de ejemplo**
 
@@ -374,7 +378,7 @@ La documentación detallada se encuentra en [gyms-endpoints.md](endpoints/gyms/g
 {
   "name": "Forze Gym",
   "description": "Gimnasio de entrenamiento funcional y fuerza.",
-  "schedule": "Lunes a viernes 07:00-22:00",
+  "localityId": 1,
   "address": "Av. Siempre Viva 123",
   "phone": "+54 11 5555-0101",
   "logoUrl": null,
@@ -384,18 +388,26 @@ La documentación detallada se encuentra en [gyms-endpoints.md](endpoints/gyms/g
 
 **Ejemplo de respuesta `GET /gyms/1`**: el mismo objeto incluyendo `"id": 1`.
 
+### Horarios informativos de gimnasio — `/gym-business-hours`
+
+La documentación detallada se encuentra en [gym-business-hours-endpoints.md](endpoints/gyms/gym-business-hours-endpoints.md). Son intervalos informativos por día y no condicionan ninguna operación de la API.
+
+### Listados por gimnasio
+
+La documentación de miembros, coaches, horarios, planes y ejercicios filtrados por gimnasio se encuentra en [gym-scoped-reads-endpoints.md](endpoints/gyms/gym-scoped-reads-endpoints.md).
+
 ### Roles de usuario — `/user-roles`
 
 La documentación detallada se encuentra en [user-roles-endpoints.md](endpoints/user-roles/user-roles-endpoints.md).
 
 ```json
-{ "name": "Alumno" }
+{ "name": "MEMBER" }
 ```
 
 **Respuesta `GET /user-roles/1`**
 
 ```json
-{ "id": 1, "name": "Alumno" }
+{ "id": 1, "name": "MEMBER" }
 ```
 
 ### Tipos de entrenador — `/coach-types`
@@ -698,6 +710,7 @@ Para cada uno de estos recursos existen las cinco operaciones descritas en [Recu
 | --- | --- |
 | Usuarios | `/users`, `/users/{id}` |
 | Gimnasios | `/gyms`, `/gyms/{id}` |
+| Horarios informativos de gimnasio | `/gym-business-hours`, `/gym-business-hours/{id}` |
 | Roles | `/user-roles`, `/user-roles/{id}` |
 | Tipos de entrenador | `/coach-types`, `/coach-types/{id}` |
 | Membresías | `/user-gyms`, `/user-gyms/{id}` |
