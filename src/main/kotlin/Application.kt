@@ -20,7 +20,10 @@ fun Application.rootModule() {
 
     install(CORS) {
         allowHost("localhost:5173", schemes = listOf("http"))
+        allowMethod(HttpMethod.Get)
         allowMethod(HttpMethod.Post)
+        allowMethod(HttpMethod.Put)
+        allowMethod(HttpMethod.Delete)
         allowMethod(HttpMethod.Options)
         allowHeader(HttpHeaders.ContentType)
         allowHeader(HttpHeaders.Authorization)

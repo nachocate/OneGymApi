@@ -51,7 +51,7 @@ GET {BASE_URL}/plans
 Authorization: Bearer <accessToken>
 ```
 
-**Respuesta — `200 OK`**: un arreglo de objetos con la estructura anterior.
+**Respuesta — `200 OK`**: un arreglo de objetos con la estructura anterior. Este listado global es exclusivo de `SUPER_ADMIN`; para un gimnasio concreto usar `GET /gyms/{gymId}/plans`.
 
 ## 2. Obtener un plan por ID
 
@@ -72,7 +72,7 @@ Authorization: Bearer <accessToken>
 }
 ```
 
-**Errores:** `400 Bad Request` si el ID no es numérico; `404 Not Found` si el plan no existe.
+**Errores:** `400 Bad Request` si el ID no es numérico; `403 Forbidden` si no pertenece al gimnasio propietario; `404 Not Found` si el plan no existe.
 
 ## 3. Crear un plan
 
@@ -120,4 +120,4 @@ Authorization: Bearer <accessToken>
 
 **Respuesta — `204 No Content`**
 
-No devuelve body. Actualmente responde `204` aun si el ID no existía.
+No devuelve body. Devuelve `404 Not Found` si el plan no existe y puede devolver `422 Unprocessable Entity` si una regla de integridad impide eliminarlo.

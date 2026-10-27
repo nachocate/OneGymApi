@@ -54,6 +54,15 @@ Then start the server:
 ./gradlew.bat run
 ```
 
+## Local image storage
+
+Images uploaded through `POST /gyms/{gymId}/uploads/images` are optimized and
+stored outside PostgreSQL in the local `uploads/` folder. PostgreSQL stores only
+the returned URL under `/media/...`. This folder is intentionally ignored by
+Git. Development settings for the directory, maximum size, dimensions and JPEG
+quality are in the `media` section of `application.conf`; keep those settings
+aligned across development machines when sharing local files is required.
+
 The `users` table is created automatically on the first user request.
 Environment variables named `DB_URL`, `DB_USER`, `DB_PASSWORD` and `DB_POOL_SIZE`
 can be used later and take priority over `application.conf`.

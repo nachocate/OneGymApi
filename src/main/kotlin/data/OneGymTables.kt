@@ -104,6 +104,7 @@ object Plans : LongIdTable("plans") {
     val gym = reference("gym_id", Gyms)
     val planType = reference("plan_type_id", PlanTypes)
     val planRoot = reference("plan_root_id", Plans).nullable()
+    val revision = long("revision").default(1)
 }
 
 object Weeks : LongIdTable("weeks") {

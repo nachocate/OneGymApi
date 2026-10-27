@@ -261,6 +261,7 @@ CREATE TABLE plans (
                        gym_id BIGINT NOT NULL,
                        plan_type_id BIGINT NOT NULL,
                        plan_root_id BIGINT,
+                       revision BIGINT NOT NULL DEFAULT 1,
 
                        CONSTRAINT fk_plans_gym
                            FOREIGN KEY (gym_id) REFERENCES gyms(id),
@@ -272,7 +273,10 @@ CREATE TABLE plans (
                            FOREIGN KEY (plan_root_id) REFERENCES plans(id),
 
                        CONSTRAINT chk_plans_not_self_root
-                           CHECK (plan_root_id IS NULL OR plan_root_id <> id)
+                           CHECK (plan_root_id IS NULL OR plan_root_id <> id),
+
+                       CONSTRAINT chk_plans_revision_positive
+                           CHECK (revision > 0)
 );
 
 -- ============================================================

@@ -7,8 +7,11 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import org.koin.logger.SLF4JLogger
 import org.koin.ktor.ext.inject
+import com.concatstudio.onegym.media.MediaStorageSettings
+import io.ktor.server.http.content.staticFiles
 
 fun Application.configureRouting() {
+    val mediaSettings: MediaStorageSettings by inject()
     routing {
         get("/") {
             call.respondText("Hello, World!")
@@ -17,6 +20,7 @@ fun Application.configureRouting() {
             call.respond(mapOf("hello" to "world"))
         }
         authenticationRouting()
+        staticFiles(mediaSettings.publicPath, mediaSettings.rootDirectory.toFile())
         authenticate("auth-jwt") {
             profileRouting()
             statusRouting()
@@ -25,10 +29,13 @@ fun Application.configureRouting() {
             activePlanRouting()
             coachTypeRouting()
             gymCoachRouting()
+            gymCoachDashboardRouting()
             userRouting()
             gymRouting()
             gymMemberRouting()
             gymScopedReadRouting()
+            planificationRouting()
+            imageUploadRouting()
             gymBusinessHourRouting()
             userRoleRouting()
             userGymRouting()

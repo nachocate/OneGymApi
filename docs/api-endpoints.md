@@ -23,6 +23,8 @@ Guía de integración para frontend basada en las rutas actualmente declaradas e
 
 > Nota de CORS: la configuración actual permite como origen explícito `http://localhost:5173`. Otros orígenes requerirán una actualización de la configuración del backend.
 
+El origen configurado puede realizar `GET`, `POST`, `PUT`, `DELETE` y el preflight `OPTIONS` con los headers `Authorization` y `Content-Type`.
+
 ## Índice
 
 | Área | Endpoints |
@@ -32,6 +34,9 @@ Guía de integración para frontend basada en las rutas actualmente declaradas e
 | Sesión del usuario | `GET /profile/me`, `GET /status` |
 | Información del gimnasio | `GET /{gymId}/home`, `GET /{gymId}/news`, `GET /plan/{gymId}/me` |
 | Lecturas administrativas por gym | `GET /gyms/{gymId}/members`, `/coaches`, `/business-hours`, `/plans`, `/exercises` |
+| Planificaciones atómicas | [`GET /gyms/{gymId}/plans/{planId}/structure`, `POST/PUT /gyms/{gymId}/plans`, clone y asignaciones](endpoints/planifications/planifications-endpoints.md) |
+| Administración de entrenadores | [`GET /gyms/{gymId}/coaches/details` y `POST|PUT|DELETE /gyms/{gymId}/coaches`](endpoints/gym-coaches/dashboard-gym-coaches-endpoints.md) y [guía de dashboard](frontend-dashboard-coaches-v2-guide.md) |
+| Archivos de imagen | [`POST /gyms/{gymId}/uploads/images`](endpoints/images/image-upload-endpoints.md) |
 | CRUD | Usuarios, gimnasios, membresías, entrenadores, contenido, planes y evaluaciones |
 
 ## Endpoints públicos

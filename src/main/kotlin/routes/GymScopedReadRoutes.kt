@@ -31,7 +31,7 @@ fun Route.gymScopedReadRouting() {
     route("/gyms/{gymId}") {
         memberRead("/coaches") { gymId, limit, offset -> coaches.getGymCoachesByGymId(gymId, limit, offset) }
         memberRead("/business-hours") { gymId, limit, offset -> hours.getGymBusinessHoursByGymId(gymId, limit, offset) }
-        memberRead("/plans") { gymId, limit, offset -> plans.getPlansByGymId(gymId, limit, offset) }
+        memberRead("/plans") { gymId, limit, offset -> plans.getPlanSummariesByGymId(gymId, limit, offset) }
         memberRead("/exercises") { gymId, limit, offset -> exercises.getExercisesAvailableToGym(gymId, limit, offset) }
     }
 }

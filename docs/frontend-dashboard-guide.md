@@ -1,6 +1,6 @@
 # Guía de integración — Dashboard OneGym
 
-Esta es la guía operativa para el dashboard administrativo. Describe el contrato vigente de la API, incluidos los cambios de roles, membresías, gimnasios, ejercicios, rutinas, evaluaciones y tests. Para cada payload completo consultar también el [índice de endpoints](api-endpoints.md). La aplicación móvil de miembros tiene una guía distinta: [frontend-cmp-integration-guide.md](frontend-cmp-integration-guide.md).
+Esta es la guía operativa para el dashboard administrativo. Describe el contrato vigente de la API, incluidos los cambios de roles, membresías, gimnasios, ejercicios, rutinas, evaluaciones y tests. Para cada payload completo consultar también el [índice de endpoints](api-endpoints.md). La visualización del árbol de una rutina se detalla en la [guía de estructura de planificaciones](frontend-dashboard-planification-structure-guide.md), la edición segura en la [guía de actualización de planificaciones](frontend-dashboard-planification-update-guide.md), la gestión de entrenadores en la [guía actualizada de coaches](frontend-dashboard-coaches-v2-guide.md), los catálogos globales en la [guía de roles y catálogos](frontend-dashboard-global-catalogs-guide.md), la consulta de evaluaciones en la [guía de evaluaciones](frontend-dashboard-evaluations-guide.md) y la gestión de mediciones en la [guía de tests](frontend-dashboard-user-tests-guide.md). La aplicación móvil de miembros tiene una guía distinta: [frontend-cmp-integration-guide.md](frontend-cmp-integration-guide.md).
 
 ## 1. Convenciones de cliente HTTP
 
@@ -177,12 +177,17 @@ La baja elimina únicamente la membresía, nunca el usuario global. El propio mi
 ### Coaches, horarios y noticias
 
 - `POST|PUT|DELETE /gym-coaches` requiere `ADMIN`, `OWNER` o `SUPER_ADMIN`; el modelo contiene `userId`, `gymId`, `coachTypeId`, `startDate`, `endDate`.
+- Para implementar la pantalla y sus flujos de alta, edición y finalización, seguir la [guía de coaches](frontend-dashboard-coaches-guide.md).
 - `POST|PUT|DELETE /gym-business-hours` requiere `ADMIN`, `OWNER` o `SUPER_ADMIN`. Cada horario contiene `gymId`, `dayOfWeek` (`1` lunes a `7` domingo), `opensAt` y `closesAt` (`HH:mm:ss`).
 - `POST|PUT|DELETE /news` requiere `ADMIN`, `OWNER` o `SUPER_ADMIN` y el body contiene `gymId`, `title`, `description`, `date`, `imageUrl`.
 
 ## 6. Rutinas, ejercicios y datos de entrenamiento
 
-Los CRUD de `plans`, `weeks`, `days`, `blocks` y `block-exercises` forman la rutina. Las escrituras requieren `COACH` o superior dentro del gimnasio propietario. No permitir que la UI mueva una entidad existente a otro gimnasio mediante `PUT`.
+Una rutina se administra mediante las rutas atómicas de planificación; los CRUD individuales de `plans`, `weeks`, `days`, `blocks` y `block-exercises` permanecen como rutas técnicas/legadas. Las escrituras requieren `COACH` o superior dentro del gimnasio propietario. No permitir que la UI mueva una entidad existente a otro gimnasio mediante `PUT`.
+
+Para el flujo de administración, la jerarquía y las limitaciones actuales del contrato, seguir la [guía de planes](frontend-dashboard-plans-guide.md).
+
+Para el editor visual completo y el contrato de API pendiente que lo habilita, seguir la [especificación de planificaciones](frontend-dashboard-planification-builder-guide.md).
 
 | Recurso | Campos clave de escritura |
 | --- | --- |
@@ -198,6 +203,7 @@ Para ejercicios:
 - Un ejercicio del gimnasio debe incluir su `gymId`; lo gestiona `COACH` o superior de ese gimnasio.
 - La combinación `gymId: null` e `isVisibleGlobal: false` es inválida y devuelve `400`.
 - Para el selector de ejercicios de una rutina, usar `GET /gyms/{gymId}/exercises`, no el listado global.
+- Para la pantalla de administración y sus flujos de alta, edición y baja, seguir la [guía de ejercicios](frontend-dashboard-exercises-guide.md).
 
 ### Asignaciones, actividad y registros
 
@@ -246,7 +252,13 @@ Los bodies completos de `POST` y `PUT` deben incluir `userId`; no permitir cambi
 
 Aunque el backend permite `DELETE` a un coach autorizado, por decisión de producto el dashboard no debe mostrar la acción de eliminar evaluaciones ni tests por ahora.
 
-## 7. Respuestas y errores
+## 7. Carga de imágenes
+
+Para logo, banner, noticias o ejercicios, subir primero el archivo mediante `POST /gyms/{gymId}/uploads/images` usando `multipart/form-data` y un único campo `image`. La respuesta incluye una URL relativa bajo `/media`; guardar esa URL en el recurso correspondiente después de que la carga sea exitosa.
+
+La carga requiere `COACH` o superior. Usar la [documentación de imágenes](endpoints/images/image-upload-endpoints.md) para límites, formatos y ejemplos. No enviar la imagen dentro de JSON ni guardarla como base64 en PostgreSQL.
+
+## 8. Respuestas y errores
 
 - `POST` de CRUD estándar responde `201 Created` sin body. Excepciones: `POST /gyms` y los dos `POST /gyms/{gymId}/members...` devuelven el recurso creado.
 - `PUT` y `DELETE` exitosos responden `204 No Content`.
@@ -259,7 +271,7 @@ Aunque el backend permite `DELETE` a un coach autorizado, por decisión de produ
 
 Los errores producidos por el manejador central pueden tener la forma `{ "code": "...", "message": "..." }`. Algunos rechazos de rutas existentes aún pueden llegar sin body; por lo tanto la UI debe decidir principalmente por el código HTTP y usar `message` solo cuando esté presente. Los errores de red también requieren una pantalla o notificación global.
 
-## 8. Checklist de entrega del dashboard
+## 9. Checklist de entrega del dashboard
 
 - [ ] Interceptor con bearer y un único refresh controlado ante `401`.
 - [ ] Limpieza de sesión si refresh o el reintento fallan con `401`.
@@ -270,4 +282,5 @@ Los errores producidos por el manejador central pueden tener la forma `{ "code":
 - [ ] Edición de perfil sin contraseña; cambio de contraseña por endpoint dedicado.
 - [ ] Altas/bajas de miembros mediante `/gyms/{gymId}/members`, nunca mediante `/user-gyms`.
 - [ ] Evaluaciones y tests filtrados por `userId`, conservando ese usuario al editar.
+- [ ] Las imágenes se suben por `multipart/form-data` y solo se persiste la URL retornada.
 - [ ] Manejo visible de errores de red, `403`, `404`, `409` y `422`.

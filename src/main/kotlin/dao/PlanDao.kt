@@ -11,4 +11,5 @@ class PlanDao(id: EntityID<Long>) : LongEntity(id) {
     var gymId by Plans.gym
     var planTypeId by Plans.planType
     var planRootId by Plans.planRoot
+    var revision by Plans.revision
 }

@@ -10,7 +10,7 @@ Documentación para administrar el catálogo de ejercicios globales o propios de
 - Los IDs son `Long` autogenerados. No enviar `id` al crear.
 - Un ejercicio global debe usar `gymId: null` e `isVisibleGlobal: true`.
 - La API y PostgreSQL rechazan la combinación `gymId: null` con `isVisibleGlobal: false`.
-- Un ejercicio específico de un gimnasio debe informar el `gymId` correspondiente. `isVisibleGlobal` controla si también puede verse globalmente.
+- Un ejercicio específico de un gimnasio debe informar el `gymId` correspondiente. El catálogo de ese gimnasio se consulta mediante `GET /gyms/{gymId}/exercises`; incluye ejercicios propios y globales.
 
 ## Estructura de un ejercicio
 
@@ -22,7 +22,7 @@ Documentación para administrar el catálogo de ejercicios globales o propios de
 | `videoUrl` | string \| null | Sí | URL de video demostrativo. |
 | `imageUrl` | string \| null | Sí | URL de imagen del ejercicio. |
 | `gymId` | number \| null | Sí | Gimnasio propietario o `null` para ejercicio global. |
-| `isVisibleGlobal` | boolean | Sí | Indica si el ejercicio es visible globalmente. Por defecto es `true`. |
+| `isVisibleGlobal` | boolean | Sí | Debe ser `true` cuando `gymId` es `null`. Los ejercicios propios se consultan únicamente desde su gimnasio. |
 
 **Body de ejemplo**
 
@@ -58,7 +58,7 @@ GET {BASE_URL}/exercises
 Authorization: Bearer <accessToken>
 ```
 
-**Respuesta — `200 OK`**: un arreglo de objetos con la estructura anterior.
+**Respuesta — `200 OK`**: un arreglo de objetos con la estructura anterior. Este listado global es exclusivo de `SUPER_ADMIN`; los miembros de un gimnasio deben usar `GET /gyms/{gymId}/exercises`.
 
 ## 2. Obtener un ejercicio por ID
 
@@ -69,7 +69,7 @@ Authorization: Bearer <accessToken>
 
 **Respuesta — `200 OK`**: un objeto con la estructura de respuesta indicada arriba.
 
-**Errores:** `400 Bad Request` si el ID no es numérico; `404 Not Found` si el ejercicio no existe.
+**Errores:** `400 Bad Request` si el ID no es numérico; `403 Forbidden` si no puede acceder al gimnasio propietario; `404 Not Found` si el ejercicio no existe.
 
 ## 3. Crear un ejercicio
 
@@ -119,4 +119,4 @@ Authorization: Bearer <accessToken>
 
 **Respuesta — `204 No Content`**
 
-No devuelve body. Actualmente responde `204` aun si el ID no existía.
+No devuelve body. Devuelve `404 Not Found` si el ejercicio no existe y puede devolver `422 Unprocessable Entity` si una regla de integridad impide eliminarlo.

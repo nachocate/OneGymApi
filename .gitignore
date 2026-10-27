@@ -30,3 +30,6 @@ Thumbs.db
 src/main/resources/application.local.conf
 *.jks
 *.keystore
+
+# Locally stored media files; PostgreSQL contains only their public URLs.
+/uploads/
