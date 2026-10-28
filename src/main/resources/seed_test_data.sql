@@ -281,6 +281,43 @@ BEGIN
 END $$;
 
 -- ============================================================
+-- PLAN EXECUTION HISTORY
+--
+-- Actual work completed by a member. Missing rows are deliberately not
+-- absences: plans can be used with free or variable attendance.
+-- ============================================================
+
+INSERT INTO plan_executions
+    (id, user_plan_id, plan_day_id, execution_date, status, started_at, last_progress_at, completed_at, total_items, completed_items, progress_percent)
+OVERRIDING SYSTEM VALUE VALUES
+    (1, 1, 1, CURRENT_DATE, 'PARTIAL', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, NULL, 4, 2, 50);
+
+INSERT INTO plan_execution_items
+    (id, execution_id, source_block_exercise_id, block_position, block_name, block_laps, exercise_position,
+     exercise_id, exercise_name, quantity_type_id, repetitions, quantity, is_completed, completed_at)
+OVERRIDING SYSTEM VALUE
+SELECT
+    ROW_NUMBER() OVER (ORDER BY b.position, be.position),
+    1,
+    be.id,
+    b.position,
+    b.name,
+    b.laps,
+    be.position,
+    e.id,
+    e.name,
+    be.quantity_type_id,
+    be.repetitions,
+    be.quantity,
+    be.position = 0,
+    CASE WHEN be.position = 0 THEN CURRENT_TIMESTAMP ELSE NULL END
+FROM blocks b
+JOIN block_exercises be ON be.block_id = b.id
+JOIN exercises e ON e.id = be.exercise_id
+WHERE b.day_id = 1
+ORDER BY b.position, be.position;
+
+-- ============================================================
 -- CURRENT PLAN ACTIVITIES
 -- ============================================================
 
@@ -322,7 +359,33 @@ OVERRIDING SYSTEM VALUE VALUES
     (1, 1, 'Evaluacion inicial', 'Mediciones de ingreso de Sofia.', CURRENT_TIMESTAMP - INTERVAL '30 days'),
     (2, 2, 'Evaluacion inicial', 'Mediciones de ingreso de Lucas.', CURRENT_TIMESTAMP - INTERVAL '25 days'),
     (3, 3, 'Evaluacion de seguimiento', 'Mediciones de seguimiento de Valentina.', CURRENT_TIMESTAMP - INTERVAL '10 days'),
-    (4, 4, 'Evaluacion de seguimiento', 'Mediciones de seguimiento de Martin.', CURRENT_TIMESTAMP - INTERVAL '8 days');
+    (4, 4, 'Evaluacion de seguimiento', 'Mediciones de seguimiento de Martin.', CURRENT_TIMESTAMP - INTERVAL '8 days'),
+    (5, 1, 'Evaluacion de seguimiento', 'Control de fuerza de Sofia a mitad de ciclo.', CURRENT_TIMESTAMP - INTERVAL '15 days'),
+    (6, 1, 'Evaluacion final de ciclo', 'Comparacion de fuerza de Sofia al cierre del ciclo.', CURRENT_TIMESTAMP - INTERVAL '3 days'),
+    (7, 2, 'Evaluacion de seguimiento', 'Control de progreso de Lucas.', CURRENT_TIMESTAMP - INTERVAL '7 days'),
+    (8, 3, 'Evaluacion de seguimiento', 'Segundo control de resistencia de Valentina.', CURRENT_TIMESTAMP - INTERVAL '2 days'),
+    (9, 2, 'Evaluacion final de ciclo', 'Comparacion final de fuerza de Lucas.', CURRENT_TIMESTAMP - INTERVAL '2 days'),
+    (10, 3, 'Evaluacion final de ciclo', 'Comparacion final de resistencia de Valentina.', CURRENT_TIMESTAMP - INTERVAL '1 day'),
+    (11, 4, 'Evaluacion inicial', 'Mediciones de ingreso de Martin.', CURRENT_TIMESTAMP - INTERVAL '30 days'),
+    (12, 4, 'Evaluacion final de ciclo', 'Comparacion de rendimiento de Martin.', CURRENT_TIMESTAMP - INTERVAL '1 day'),
+    (13, 5, 'Evaluacion inicial', 'Mediciones de ingreso de Camila.', CURRENT_TIMESTAMP - INTERVAL '30 days'),
+    (14, 5, 'Evaluacion de seguimiento', 'Control de fuerza de Camila.', CURRENT_TIMESTAMP - INTERVAL '15 days'),
+    (15, 5, 'Evaluacion final de ciclo', 'Comparacion final de fuerza de Camila.', CURRENT_TIMESTAMP - INTERVAL '2 days'),
+    (16, 6, 'Evaluacion inicial', 'Mediciones de ingreso de Tomas.', CURRENT_TIMESTAMP - INTERVAL '30 days'),
+    (17, 6, 'Evaluacion de seguimiento', 'Control de rendimiento de Tomas.', CURRENT_TIMESTAMP - INTERVAL '14 days'),
+    (18, 6, 'Evaluacion final de ciclo', 'Comparacion final de rendimiento de Tomas.', CURRENT_TIMESTAMP - INTERVAL '1 day'),
+    (19, 7, 'Evaluacion inicial', 'Mediciones de ingreso de Julieta.', CURRENT_TIMESTAMP - INTERVAL '30 days'),
+    (20, 7, 'Evaluacion de seguimiento', 'Control de resistencia de Julieta.', CURRENT_TIMESTAMP - INTERVAL '14 days'),
+    (21, 7, 'Evaluacion final de ciclo', 'Comparacion final de resistencia de Julieta.', CURRENT_TIMESTAMP - INTERVAL '1 day'),
+    (22, 8, 'Evaluacion inicial', 'Mediciones de ingreso de Diego.', CURRENT_TIMESTAMP - INTERVAL '30 days'),
+    (23, 8, 'Evaluacion de seguimiento', 'Control de fuerza de Diego.', CURRENT_TIMESTAMP - INTERVAL '14 days'),
+    (24, 8, 'Evaluacion final de ciclo', 'Comparacion final de fuerza de Diego.', CURRENT_TIMESTAMP - INTERVAL '1 day'),
+    (25, 9, 'Evaluacion inicial', 'Mediciones de ingreso de Paula.', CURRENT_TIMESTAMP - INTERVAL '30 days'),
+    (26, 9, 'Evaluacion de seguimiento', 'Control de potencia de Paula.', CURRENT_TIMESTAMP - INTERVAL '14 days'),
+    (27, 9, 'Evaluacion final de ciclo', 'Comparacion final de potencia de Paula.', CURRENT_TIMESTAMP - INTERVAL '1 day'),
+    (28, 10, 'Evaluacion inicial', 'Mediciones de ingreso de Nicolas.', CURRENT_TIMESTAMP - INTERVAL '30 days'),
+    (29, 10, 'Evaluacion de seguimiento', 'Control de capacidad aerobica de Nicolas.', CURRENT_TIMESTAMP - INTERVAL '14 days'),
+    (30, 10, 'Evaluacion final de ciclo', 'Comparacion final de capacidad aerobica de Nicolas.', CURRENT_TIMESTAMP - INTERVAL '1 day');
 
 INSERT INTO user_tests (
     id, exercise_id, user_id, evaluation_id, quantity_type_id,
@@ -335,7 +398,94 @@ INSERT INTO user_tests (
     (5, 5, 3, 3, NULL, 20, NULL, CURRENT_TIMESTAMP - INTERVAL '12 days', 'Test de burpees en un minuto.'),
     (6, 6, 3, 3, 5, 10, 20.00, CURRENT_TIMESTAMP - INTERVAL '10 days', 'Test de zancadas con carga.'),
     (7, 9, 4, 4, 5, 10, 16.00, CURRENT_TIMESTAMP - INTERVAL '8 days', 'Test de kettlebell swing.'),
-    (8, 10, 4, 4, 4, NULL, 5.00, CURRENT_TIMESTAMP - INTERVAL '5 days', 'Test de carrera de cinco kilometros.');
+    (8, 10, 4, 4, 4, NULL, 5.00, CURRENT_TIMESTAMP - INTERVAL '5 days', 'Test de carrera de cinco kilometros.'),
+    -- Same exercises across Sofia's three evaluations: enables strength progression charts.
+    (9, 1, 1, 5, 5, 5, 65.00, CURRENT_TIMESTAMP - INTERVAL '15 days', 'Seguimiento de sentadilla: mejora de carga.'),
+    (10, 2, 1, 5, 5, 5, 45.00, CURRENT_TIMESTAMP - INTERVAL '15 days', 'Seguimiento de press de banca: mejora de carga.'),
+    (11, 1, 1, 6, 5, 5, 70.00, CURRENT_TIMESTAMP - INTERVAL '3 days', 'Cierre de ciclo de sentadilla.'),
+    (12, 2, 1, 6, 5, 5, 50.00, CURRENT_TIMESTAMP - INTERVAL '3 days', 'Cierre de ciclo de press de banca.'),
+    -- Same exercises across Lucas's initial and follow-up evaluations.
+    (13, 3, 2, 7, 5, 5, 90.00, CURRENT_TIMESTAMP - INTERVAL '7 days', 'Seguimiento de peso muerto.'),
+    (14, 4, 2, 7, NULL, 10, NULL, CURRENT_TIMESTAMP - INTERVAL '7 days', 'Seguimiento de dominadas.'),
+    -- Same exercises across Valentina's two evaluations.
+    (15, 5, 3, 8, NULL, 25, NULL, CURRENT_TIMESTAMP - INTERVAL '2 days', 'Seguimiento de burpees en un minuto.'),
+    (16, 6, 3, 8, 5, 12, 22.50, CURRENT_TIMESTAMP - INTERVAL '2 days', 'Seguimiento de zancadas con carga.'),
+    -- Third measurement for Lucas and Valentina, using their same comparison exercises.
+    (17, 3, 2, 9, 5, 5, 95.00, CURRENT_TIMESTAMP - INTERVAL '2 days', 'Cierre de ciclo de peso muerto.'),
+    (18, 4, 2, 9, NULL, 12, NULL, CURRENT_TIMESTAMP - INTERVAL '2 days', 'Cierre de ciclo de dominadas.'),
+    (19, 5, 3, 10, NULL, 30, NULL, CURRENT_TIMESTAMP - INTERVAL '1 day', 'Cierre de ciclo de burpees.'),
+    (20, 6, 3, 10, 5, 15, 25.00, CURRENT_TIMESTAMP - INTERVAL '1 day', 'Cierre de ciclo de zancadas.'),
+    -- Martin: kettlebell swing and 5 km running progression.
+    (21, 9, 4, 11, 5, 8, 14.00, CURRENT_TIMESTAMP - INTERVAL '30 days', 'Test inicial de kettlebell swing.'),
+    (22, 10, 4, 11, 4, NULL, 5.50, CURRENT_TIMESTAMP - INTERVAL '30 days', 'Test inicial de carrera de cinco kilometros.'),
+    (23, 9, 4, 12, 5, 12, 18.00, CURRENT_TIMESTAMP - INTERVAL '1 day', 'Cierre de ciclo de kettlebell swing.'),
+    (24, 10, 4, 12, 4, NULL, 4.80, CURRENT_TIMESTAMP - INTERVAL '1 day', 'Cierre de ciclo de carrera de cinco kilometros.'),
+    -- Camila: squat and bench press progression.
+    (25, 1, 5, 13, 5, 5, 45.00, CURRENT_TIMESTAMP - INTERVAL '30 days', 'Test inicial de sentadilla.'),
+    (26, 2, 5, 13, 5, 5, 30.00, CURRENT_TIMESTAMP - INTERVAL '30 days', 'Test inicial de press de banca.'),
+    (27, 1, 5, 14, 5, 5, 52.50, CURRENT_TIMESTAMP - INTERVAL '15 days', 'Seguimiento de sentadilla.'),
+    (28, 2, 5, 14, 5, 5, 35.00, CURRENT_TIMESTAMP - INTERVAL '15 days', 'Seguimiento de press de banca.'),
+    (29, 1, 5, 15, 5, 5, 60.00, CURRENT_TIMESTAMP - INTERVAL '2 days', 'Cierre de ciclo de sentadilla.'),
+    (30, 2, 5, 15, 5, 5, 40.00, CURRENT_TIMESTAMP - INTERVAL '2 days', 'Cierre de ciclo de press de banca.'),
+    -- Tomas: deadlift and pull-up progression.
+    (31, 3, 6, 16, 5, 5, 70.00, CURRENT_TIMESTAMP - INTERVAL '30 days', 'Test inicial de peso muerto.'),
+    (32, 4, 6, 16, NULL, 5, NULL, CURRENT_TIMESTAMP - INTERVAL '30 days', 'Test inicial de dominadas.'),
+    (33, 3, 6, 17, 5, 5, 80.00, CURRENT_TIMESTAMP - INTERVAL '14 days', 'Seguimiento de peso muerto.'),
+    (34, 4, 6, 17, NULL, 8, NULL, CURRENT_TIMESTAMP - INTERVAL '14 days', 'Seguimiento de dominadas.'),
+    (35, 3, 6, 18, 5, 5, 90.00, CURRENT_TIMESTAMP - INTERVAL '1 day', 'Cierre de ciclo de peso muerto.'),
+    (36, 4, 6, 18, NULL, 10, NULL, CURRENT_TIMESTAMP - INTERVAL '1 day', 'Cierre de ciclo de dominadas.'),
+    -- Julieta: burpees and lunges progression.
+    (37, 5, 7, 19, NULL, 15, NULL, CURRENT_TIMESTAMP - INTERVAL '30 days', 'Test inicial de burpees.'),
+    (38, 6, 7, 19, 5, 8, 15.00, CURRENT_TIMESTAMP - INTERVAL '30 days', 'Test inicial de zancadas.'),
+    (39, 5, 7, 20, NULL, 22, NULL, CURRENT_TIMESTAMP - INTERVAL '14 days', 'Seguimiento de burpees.'),
+    (40, 6, 7, 20, 5, 10, 20.00, CURRENT_TIMESTAMP - INTERVAL '14 days', 'Seguimiento de zancadas.'),
+    (41, 5, 7, 21, NULL, 28, NULL, CURRENT_TIMESTAMP - INTERVAL '1 day', 'Cierre de ciclo de burpees.'),
+    (42, 6, 7, 21, 5, 12, 25.00, CURRENT_TIMESTAMP - INTERVAL '1 day', 'Cierre de ciclo de zancadas.'),
+    -- Diego: rowing and biceps curl progression.
+    (43, 7, 8, 22, 5, 8, 20.00, CURRENT_TIMESTAMP - INTERVAL '30 days', 'Test inicial de remo con mancuerna.'),
+    (44, 8, 8, 22, 5, 10, 12.00, CURRENT_TIMESTAMP - INTERVAL '30 days', 'Test inicial de curl de biceps.'),
+    (45, 7, 8, 23, 5, 10, 25.00, CURRENT_TIMESTAMP - INTERVAL '14 days', 'Seguimiento de remo con mancuerna.'),
+    (46, 8, 8, 23, 5, 12, 14.00, CURRENT_TIMESTAMP - INTERVAL '14 days', 'Seguimiento de curl de biceps.'),
+    (47, 7, 8, 24, 5, 12, 30.00, CURRENT_TIMESTAMP - INTERVAL '1 day', 'Cierre de ciclo de remo con mancuerna.'),
+    (48, 8, 8, 24, 5, 15, 16.00, CURRENT_TIMESTAMP - INTERVAL '1 day', 'Cierre de ciclo de curl de biceps.'),
+    -- Paula: kettlebell swing and 5 km running progression.
+    (49, 9, 9, 25, 5, 8, 12.00, CURRENT_TIMESTAMP - INTERVAL '30 days', 'Test inicial de kettlebell swing.'),
+    (50, 10, 9, 25, 4, NULL, 5.80, CURRENT_TIMESTAMP - INTERVAL '30 days', 'Test inicial de carrera de cinco kilometros.'),
+    (51, 9, 9, 26, 5, 10, 16.00, CURRENT_TIMESTAMP - INTERVAL '14 days', 'Seguimiento de kettlebell swing.'),
+    (52, 10, 9, 26, 4, NULL, 5.20, CURRENT_TIMESTAMP - INTERVAL '14 days', 'Seguimiento de carrera de cinco kilometros.'),
+    (53, 9, 9, 27, 5, 12, 20.00, CURRENT_TIMESTAMP - INTERVAL '1 day', 'Cierre de ciclo de kettlebell swing.'),
+    (54, 10, 9, 27, 4, NULL, 4.70, CURRENT_TIMESTAMP - INTERVAL '1 day', 'Cierre de ciclo de carrera de cinco kilometros.'),
+    -- Nicolas: squat and bench press progression.
+    (55, 1, 10, 28, 5, 5, 40.00, CURRENT_TIMESTAMP - INTERVAL '30 days', 'Test inicial de sentadilla.'),
+    (56, 2, 10, 28, 5, 5, 25.00, CURRENT_TIMESTAMP - INTERVAL '30 days', 'Test inicial de press de banca.'),
+    (57, 1, 10, 29, 5, 5, 47.50, CURRENT_TIMESTAMP - INTERVAL '14 days', 'Seguimiento de sentadilla.'),
+    (58, 2, 10, 29, 5, 5, 30.00, CURRENT_TIMESTAMP - INTERVAL '14 days', 'Seguimiento de press de banca.'),
+    (59, 1, 10, 30, 5, 5, 55.00, CURRENT_TIMESTAMP - INTERVAL '1 day', 'Cierre de ciclo de sentadilla.'),
+    (60, 2, 10, 30, 5, 5, 35.00, CURRENT_TIMESTAMP - INTERVAL '1 day', 'Cierre de ciclo de press de banca.');
+
+-- ============================================================
+-- ACTIVITIES AND GROUPS
+-- ============================================================
+
+INSERT INTO activities (gym_id, title, description, banner_url, participation_mode, status, is_visible, default_max_capacity)
+VALUES (1, 'Boxeo funcional', 'Clases regulares de boxeo con grupos y cupos de prueba.', NULL, 'HYBRID', 'ACTIVE', TRUE, 15);
+
+INSERT INTO activity_schedules (activity_id, day_of_week, starts_at, ends_at, max_capacity, active_from)
+VALUES
+    (1, 2, '17:00', '18:00', 15, CURRENT_DATE),
+    (1, 4, '17:00', '18:00', 15, CURRENT_DATE);
+
+INSERT INTO activity_schedule_instructors (schedule_id, gym_coach_id)
+VALUES (1, 1), (2, 1);
+
+INSERT INTO activity_groups (activity_id, name, join_policy, status, max_members)
+VALUES (1, 'Boxeo Mar-Jue 17 hs', 'OPEN', 'ACTIVE', 10);
+
+INSERT INTO activity_group_schedules (group_id, schedule_id)
+VALUES (1, 1), (1, 2);
+
+INSERT INTO activity_group_memberships (group_id, user_id, start_date)
+VALUES (1, 1, CURRENT_DATE);
 
 -- Keep identity sequences ahead of the explicit test IDs.
 SELECT setval(pg_get_serial_sequence('user_roles', 'id'), COALESCE((SELECT MAX(id) FROM user_roles), 1), true);
@@ -362,8 +512,16 @@ SELECT setval(pg_get_serial_sequence('days', 'id'), COALESCE((SELECT MAX(id) FRO
 SELECT setval(pg_get_serial_sequence('blocks', 'id'), COALESCE((SELECT MAX(id) FROM blocks), 1), true);
 SELECT setval(pg_get_serial_sequence('block_exercises', 'id'), COALESCE((SELECT MAX(id) FROM block_exercises), 1), true);
 SELECT setval(pg_get_serial_sequence('current_plan_activities', 'id'), COALESCE((SELECT MAX(id) FROM current_plan_activities), 1), true);
+SELECT setval(pg_get_serial_sequence('plan_executions', 'id'), COALESCE((SELECT MAX(id) FROM plan_executions), 1), true);
+SELECT setval(pg_get_serial_sequence('plan_execution_items', 'id'), COALESCE((SELECT MAX(id) FROM plan_execution_items), 1), true);
 SELECT setval(pg_get_serial_sequence('registers', 'id'), COALESCE((SELECT MAX(id) FROM registers), 1), true);
 SELECT setval(pg_get_serial_sequence('evaluations', 'id'), COALESCE((SELECT MAX(id) FROM evaluations), 1), true);
 SELECT setval(pg_get_serial_sequence('user_tests', 'id'), COALESCE((SELECT MAX(id) FROM user_tests), 1), true);
+SELECT setval(pg_get_serial_sequence('activities', 'id'), COALESCE((SELECT MAX(id) FROM activities), 1), true);
+SELECT setval(pg_get_serial_sequence('activity_schedules', 'id'), COALESCE((SELECT MAX(id) FROM activity_schedules), 1), true);
+SELECT setval(pg_get_serial_sequence('activity_schedule_instructors', 'id'), COALESCE((SELECT MAX(id) FROM activity_schedule_instructors), 1), true);
+SELECT setval(pg_get_serial_sequence('activity_groups', 'id'), COALESCE((SELECT MAX(id) FROM activity_groups), 1), true);
+SELECT setval(pg_get_serial_sequence('activity_group_schedules', 'id'), COALESCE((SELECT MAX(id) FROM activity_group_schedules), 1), true);
+SELECT setval(pg_get_serial_sequence('activity_group_memberships', 'id'), COALESCE((SELECT MAX(id) FROM activity_group_memberships), 1), true);
 
 COMMIT;

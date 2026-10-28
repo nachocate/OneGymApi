@@ -25,7 +25,7 @@ class ActivePlanRepositoryImp : ActivePlanRepository {
         activityRows.forEach { row ->
             val planId = row[Plans.id].value
             val state = planStates.getOrPut(planId) {
-                PlanState(name = row[Plans.name])
+                PlanState(userPlanId = row[UserPlans.id].value, name = row[Plans.name])
             }
             row[CurrentPlanActivities.activeWeek]?.value?.let(state.activeWeekIds::add)
             row[CurrentPlanActivities.activeDay]?.value?.let(state.activeDayIds::add)
@@ -67,6 +67,7 @@ class ActivePlanRepositoryImp : ActivePlanRepository {
 
         planStates.map { (planId, state) ->
             ActivePlanResponse(
+                userPlanId = state.userPlanId,
                 id = planId,
                 name = state.name,
                 isActive = true,
@@ -108,6 +109,7 @@ class ActivePlanRepositoryImp : ActivePlanRepository {
     }
 
     private data class PlanState(
+        val userPlanId: Long,
         val name: String,
         val activeWeekIds: MutableSet<Long> = mutableSetOf(),
         val activeDayIds: MutableSet<Long> = mutableSetOf()

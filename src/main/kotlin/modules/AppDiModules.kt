@@ -32,6 +32,8 @@ val appDiModules = module {
     single<PlanTypeRepository> { PlanTypeRepositoryImp() }
     single<PlanRepository> { PlanRepositoryImp() }
     single<PlanificationRepository> { PlanificationRepositoryImp() }
+    single<PlanExecutionRepository> { PlanExecutionRepositoryImp() }
+    single<ActivityRepository> { ActivityRepositoryImp() }
     single<WeekRepository> { WeekRepositoryImp() }
     single<DayRepository> { DayRepositoryImp() }
     single<ExerciseRepository> { ExerciseRepositoryImp() }

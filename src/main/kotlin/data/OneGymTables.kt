@@ -29,6 +29,7 @@ object Gyms : LongIdTable("gyms") {
     val phone = varchar("phone", 50).nullable()
     val logoUrl = text("logo_url").nullable()
     val bannerUrl = text("banner_url").nullable()
+    val timezone = varchar("timezone", 64).default("America/Argentina/Buenos_Aires")
 }
 
 object GymBusinessHours : LongIdTable("gym_business_hours") {
@@ -76,6 +77,80 @@ object GymCoaches : LongIdTable("gym_coaches") {
     val coachType = reference("coach_type_id", CoachTypes)
     val startDate = date("start_date")
     val endDate = date("end_date").nullable()
+}
+
+object Activities : LongIdTable("activities") {
+    val gym = reference("gym_id", Gyms)
+    val title = varchar("title", 150)
+    val description = text("description").nullable()
+    val bannerUrl = text("banner_url").nullable()
+    val participationMode = varchar("participation_mode", 20)
+    val status = varchar("status", 20).default("DRAFT")
+    val isVisible = bool("is_visible").default(false)
+    val defaultMaxCapacity = integer("default_max_capacity").nullable()
+    val createdAt = timestampWithTimeZone("created_at")
+    val updatedAt = timestampWithTimeZone("updated_at")
+}
+
+object ActivitySchedules : LongIdTable("activity_schedules") {
+    val activity = reference("activity_id", Activities)
+    val dayOfWeek = short("day_of_week")
+    val startsAt = time("starts_at")
+    val endsAt = time("ends_at")
+    val maxCapacity = integer("max_capacity").nullable()
+    val activeFrom = date("active_from")
+    val activeUntil = date("active_until").nullable()
+}
+
+object ActivityScheduleInstructors : LongIdTable("activity_schedule_instructors") {
+    val schedule = reference("schedule_id", ActivitySchedules)
+    val gymCoach = reference("gym_coach_id", GymCoaches)
+}
+
+object ActivityGroups : LongIdTable("activity_groups") {
+    val activity = reference("activity_id", Activities)
+    val name = varchar("name", 150)
+    val joinPolicy = varchar("join_policy", 20)
+    val status = varchar("status", 20).default("ACTIVE")
+    val maxMembers = integer("max_members").nullable()
+}
+
+object ActivityGroupSchedules : LongIdTable("activity_group_schedules") {
+    val group = reference("group_id", ActivityGroups)
+    val schedule = reference("schedule_id", ActivitySchedules)
+}
+
+object ActivityGroupMemberships : LongIdTable("activity_group_memberships") {
+    val group = reference("group_id", ActivityGroups)
+    val user = reference("user_id", Users)
+    val startDate = date("start_date")
+    val endDate = date("end_date").nullable()
+}
+
+object ActivityGroupJoinRequests : LongIdTable("activity_group_join_requests") {
+    val group = reference("group_id", ActivityGroups)
+    val user = reference("user_id", Users)
+    val status = varchar("status", 20).default("PENDING")
+    val requestedAt = timestampWithTimeZone("requested_at")
+    val reviewedAt = timestampWithTimeZone("reviewed_at").nullable()
+    val reviewedByUser = reference("reviewed_by_user_id", Users).nullable()
+}
+
+object ActivityOccurrences : LongIdTable("activity_occurrences") {
+    val schedule = reference("schedule_id", ActivitySchedules)
+    val occurrenceDate = date("occurrence_date")
+    val startsAt = timestampWithTimeZone("starts_at")
+    val endsAt = timestampWithTimeZone("ends_at")
+    val maxCapacity = integer("max_capacity").nullable()
+    val status = varchar("status", 20).default("SCHEDULED")
+}
+
+object ActivityReservations : LongIdTable("activity_reservations") {
+    val occurrence = reference("occurrence_id", ActivityOccurrences)
+    val user = reference("user_id", Users)
+    val status = varchar("status", 20).default("CONFIRMED")
+    val createdAt = timestampWithTimeZone("created_at")
+    val cancelledAt = timestampWithTimeZone("cancelled_at").nullable()
 }
 
 object UserRefreshTokens : LongIdTable("user_refresh_tokens") {
@@ -157,6 +232,37 @@ object CurrentPlanActivities : LongIdTable("current_plan_activities") {
     val activeWeek = reference("active_week_id", Weeks).nullable()
     val activeDay = reference("active_day_id", Days).nullable()
     val isActive = bool("is_active").default(false)
+}
+
+/** Historical, user-driven execution of one assigned plan on one local gym date. */
+object PlanExecutions : LongIdTable("plan_executions") {
+    val userPlan = reference("user_plan_id", UserPlans)
+    val planDay = reference("plan_day_id", Days)
+    val executionDate = date("execution_date")
+    val status = varchar("status", 20)
+    val startedAt = timestampWithTimeZone("started_at")
+    val lastProgressAt = timestampWithTimeZone("last_progress_at")
+    val completedAt = timestampWithTimeZone("completed_at").nullable()
+    val totalItems = integer("total_items")
+    val completedItems = integer("completed_items").default(0)
+    val progressPercent = integer("progress_percent").default(0)
+}
+
+/** Snapshot of a planned exercise at the moment an execution starts. */
+object PlanExecutionItems : LongIdTable("plan_execution_items") {
+    val execution = reference("execution_id", PlanExecutions)
+    val sourceBlockExercise = reference("source_block_exercise_id", BlockExercises).nullable()
+    val blockPosition = integer("block_position")
+    val blockName = varchar("block_name", 150).nullable()
+    val blockLaps = integer("block_laps")
+    val exercisePosition = integer("exercise_position")
+    val exercise = reference("exercise_id", Exercises).nullable()
+    val exerciseName = varchar("exercise_name", 150)
+    val quantityType = reference("quantity_type_id", QuantityTypes).nullable()
+    val repetitions = integer("repetitions").nullable()
+    val quantity = decimal("quantity", 10, 2).nullable()
+    val isCompleted = bool("is_completed").default(false)
+    val completedAt = timestampWithTimeZone("completed_at").nullable()
 }
 
 object Registers : LongIdTable("registers") {

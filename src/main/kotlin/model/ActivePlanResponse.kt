@@ -9,6 +9,8 @@ data class ActivePlansResponse(
 
 @Serializable
 data class ActivePlanResponse(
+    /** Assignment identifier required to start a personal plan execution. */
+    val userPlanId: Long,
     val id: Long,
     val name: String,
     val isActive: Boolean,

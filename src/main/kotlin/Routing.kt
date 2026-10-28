@@ -35,6 +35,8 @@ fun Application.configureRouting() {
             gymMemberRouting()
             gymScopedReadRouting()
             planificationRouting()
+            planExecutionRouting()
+            activityRouting()
             imageUploadRouting()
             gymBusinessHourRouting()
             userRoleRouting()

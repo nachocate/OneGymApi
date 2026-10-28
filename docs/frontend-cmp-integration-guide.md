@@ -4,6 +4,8 @@ Esta guía es para la aplicación móvil Kotlin Multiplatform / Compose Multipla
 
 La referencia completa de paths y payloads está en [api-endpoints.md](api-endpoints.md).
 
+Para implementar el seguimiento de cada sesión de rutina, usar la guía específica: [frontend-cmp-plan-executions-guide.md](frontend-cmp-plan-executions-guide.md).
+
 ## Alcance de la aplicación móvil
 
 La app móvil debe permitir al usuario autenticado:
@@ -13,9 +15,10 @@ La app móvil debe permitir al usuario autenticado:
 - conocer los gimnasios a los que pertenece y seleccionar uno;
 - consultar información del gimnasio seleccionado, sus coaches, noticias y horarios cuando estén disponibles;
 - consultar las rutinas activas preparadas para él por los coaches;
-- consultar sus propias evaluaciones y tests cuando esas pantallas estén habilitadas.
+- consultar sus propias evaluaciones y tests cuando esas pantallas estén habilitadas;
+- iniciar una rutina asignada y registrar el avance de sus ejercicios durante el día.
 
-No debe mostrar acciones administrativas ni consumir endpoints `POST`, `PUT` o `DELETE` de recursos de negocio.
+No debe mostrar acciones administrativas ni consumir endpoints `POST`, `PUT` o `DELETE` de recursos de negocio, salvo los endpoints personales de ejecución de rutina documentados aquí.
 
 ## 1. Organización CMP recomendada
 
@@ -106,6 +109,32 @@ Guardar `selectedGymId` en el estado de la aplicación, verificando que siempre 
 | Mis rutinas | `GET /plan/{gymId}/me` | Planes activos del usuario y toda su estructura. |
 | Mis evaluaciones | `GET /evaluations?userId={currentUserId}` | Evaluaciones del usuario autenticado. |
 | Mis tests | `GET /user-tests?userId={currentUserId}` | Tests del usuario autenticado. |
+| Ejecución de rutina | `POST /gyms/{gymId}/me/plan-executions` | Inicia o retoma la rutina elegida para hoy. |
+| Progreso e historial | `PATCH`/`GET /gyms/{gymId}/me/plan-executions...` | Marca ejercicios y consulta ejecuciones reales. |
+
+## 6. Ejecución de rutina personal
+
+La app no debe inferir asistencia: si el usuario no inicia una rutina, no hay ningún registro que mostrar como falta. Al presionar “Comenzar rutina”, usar `userPlanId` recibido en cada elemento de `GET /plan/{gymId}/me` y el `planDayId` elegido. No usar `plan.id` como `userPlanId`:
+
+```http
+POST /gyms/{gymId}/me/plan-executions
+{ "userPlanId": 1, "planDayId": 1 }
+```
+
+El endpoint es idempotente para el mismo plan y día: `201` significa que comenzó una ejecución y `200` que se retomó la existente. Guardar el `execution.id` recibido. Cada vez que el usuario marque o desmarque un ejercicio, enviar:
+
+```http
+PATCH /gyms/{gymId}/me/plan-executions/{executionId}/items/{itemId}
+{ "completed": true }
+```
+
+La respuesta trae el porcentaje recalculado. No calcularlo ni persistirlo del lado móvil. Se puede editar hasta las `23:50` de la zona del gimnasio; luego una ejecución incompleta quedará `PARTIAL`. Para el historial usar siempre un rango explícito:
+
+```http
+GET /gyms/{gymId}/me/plan-executions?from=2026-10-01&to=2026-10-31
+```
+
+La referencia completa está en [plan-executions-endpoints.md](endpoints/plan-executions/plan-executions-endpoints.md).
 
 Usar el `gymId` elegido sólo si está incluido en `GET /status`. Las rutas de inicio, noticias y plan propio devuelven `403` cuando la membresía no está vigente.
 

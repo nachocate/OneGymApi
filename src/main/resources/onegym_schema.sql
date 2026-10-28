@@ -100,7 +100,9 @@ CREATE TABLE gyms (
                       address VARCHAR(255),
                       phone VARCHAR(50),
                       logo_url TEXT,
-                      banner_url TEXT
+                      banner_url TEXT,
+                      timezone VARCHAR(64) NOT NULL DEFAULT 'America/Argentina/Buenos_Aires',
+                      CONSTRAINT chk_gyms_timezone CHECK (timezone <> '')
 );
 
 -- Informational opening hours. They are not used to authorize or block any
@@ -223,6 +225,120 @@ CREATE TABLE gym_coaches (
                               CONSTRAINT uq_gym_coaches_assignment
                                   UNIQUE (user_id, gym_id, coach_type_id, start_date)
 );
+
+-- ============================================================
+-- ACTIVITIES, RECURRING GROUPS AND RESERVATIONS
+-- ============================================================
+
+CREATE TABLE activities (
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    gym_id BIGINT NOT NULL REFERENCES gyms(id) ON DELETE CASCADE,
+    title VARCHAR(150) NOT NULL,
+    description TEXT,
+    banner_url TEXT,
+    participation_mode VARCHAR(20) NOT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'DRAFT',
+    is_visible BOOLEAN NOT NULL DEFAULT FALSE,
+    default_max_capacity INTEGER,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT chk_activities_mode CHECK (participation_mode IN ('OPEN', 'GROUP_ONLY', 'HYBRID')),
+    CONSTRAINT chk_activities_status CHECK (status IN ('DRAFT', 'ACTIVE', 'SUSPENDED', 'ARCHIVED')),
+    CONSTRAINT chk_activities_capacity CHECK (default_max_capacity IS NULL OR default_max_capacity BETWEEN 1 AND 1000)
+);
+
+CREATE TABLE activity_schedules (
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    activity_id BIGINT NOT NULL REFERENCES activities(id) ON DELETE CASCADE,
+    day_of_week SMALLINT NOT NULL,
+    starts_at TIME NOT NULL,
+    ends_at TIME NOT NULL,
+    max_capacity INTEGER,
+    active_from DATE NOT NULL,
+    active_until DATE,
+    CONSTRAINT uq_activity_schedules_slot UNIQUE (activity_id, day_of_week, starts_at, active_from),
+    CONSTRAINT chk_activity_schedules_day CHECK (day_of_week BETWEEN 1 AND 7),
+    CONSTRAINT chk_activity_schedules_interval CHECK (ends_at > starts_at),
+    CONSTRAINT chk_activity_schedules_capacity CHECK (max_capacity IS NULL OR max_capacity BETWEEN 1 AND 1000),
+    CONSTRAINT chk_activity_schedules_dates CHECK (active_until IS NULL OR active_until >= active_from)
+);
+
+CREATE TABLE activity_schedule_instructors (
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    schedule_id BIGINT NOT NULL REFERENCES activity_schedules(id) ON DELETE CASCADE,
+    gym_coach_id BIGINT NOT NULL REFERENCES gym_coaches(id),
+    CONSTRAINT uq_activity_schedule_instructors UNIQUE (schedule_id, gym_coach_id)
+);
+
+CREATE TABLE activity_groups (
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    activity_id BIGINT NOT NULL REFERENCES activities(id) ON DELETE CASCADE,
+    name VARCHAR(150) NOT NULL,
+    join_policy VARCHAR(20) NOT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
+    max_members INTEGER,
+    CONSTRAINT uq_activity_groups_name UNIQUE (activity_id, name),
+    CONSTRAINT chk_activity_groups_policy CHECK (join_policy IN ('OPEN', 'REQUEST_ONLY')),
+    CONSTRAINT chk_activity_groups_status CHECK (status IN ('ACTIVE', 'PAUSED', 'ARCHIVED')),
+    CONSTRAINT chk_activity_groups_capacity CHECK (max_members IS NULL OR max_members BETWEEN 1 AND 1000)
+);
+
+CREATE TABLE activity_group_schedules (
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    group_id BIGINT NOT NULL REFERENCES activity_groups(id) ON DELETE CASCADE,
+    schedule_id BIGINT NOT NULL REFERENCES activity_schedules(id) ON DELETE CASCADE,
+    CONSTRAINT uq_activity_group_schedules UNIQUE (group_id, schedule_id)
+);
+
+CREATE TABLE activity_group_memberships (
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    group_id BIGINT NOT NULL REFERENCES activity_groups(id) ON DELETE CASCADE,
+    user_id BIGINT NOT NULL REFERENCES users(id),
+    start_date DATE NOT NULL,
+    end_date DATE,
+    CONSTRAINT chk_activity_group_memberships_dates CHECK (end_date IS NULL OR end_date >= start_date)
+);
+CREATE UNIQUE INDEX uq_activity_group_memberships_active
+    ON activity_group_memberships(group_id, user_id) WHERE end_date IS NULL;
+
+CREATE TABLE activity_group_join_requests (
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    group_id BIGINT NOT NULL REFERENCES activity_groups(id) ON DELETE CASCADE,
+    user_id BIGINT NOT NULL REFERENCES users(id),
+    status VARCHAR(20) NOT NULL DEFAULT 'PENDING',
+    requested_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    reviewed_at TIMESTAMPTZ,
+    reviewed_by_user_id BIGINT REFERENCES users(id),
+    CONSTRAINT chk_activity_group_join_requests_status CHECK (status IN ('PENDING', 'APPROVED', 'REJECTED', 'CANCELLED'))
+);
+CREATE UNIQUE INDEX uq_activity_group_join_requests_pending
+    ON activity_group_join_requests(group_id, user_id) WHERE status = 'PENDING';
+
+CREATE TABLE activity_occurrences (
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    schedule_id BIGINT NOT NULL REFERENCES activity_schedules(id) ON DELETE CASCADE,
+    occurrence_date DATE NOT NULL,
+    starts_at TIMESTAMPTZ NOT NULL,
+    ends_at TIMESTAMPTZ NOT NULL,
+    max_capacity INTEGER,
+    status VARCHAR(20) NOT NULL DEFAULT 'SCHEDULED',
+    CONSTRAINT uq_activity_occurrences_schedule_date UNIQUE (schedule_id, occurrence_date),
+    CONSTRAINT chk_activity_occurrences_interval CHECK (ends_at > starts_at),
+    CONSTRAINT chk_activity_occurrences_capacity CHECK (max_capacity IS NULL OR max_capacity BETWEEN 1 AND 1000),
+    CONSTRAINT chk_activity_occurrences_status CHECK (status IN ('SCHEDULED', 'CANCELLED', 'COMPLETED'))
+);
+
+CREATE TABLE activity_reservations (
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    occurrence_id BIGINT NOT NULL REFERENCES activity_occurrences(id) ON DELETE CASCADE,
+    user_id BIGINT NOT NULL REFERENCES users(id),
+    status VARCHAR(20) NOT NULL DEFAULT 'CONFIRMED',
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    cancelled_at TIMESTAMPTZ,
+    CONSTRAINT chk_activity_reservations_status CHECK (status IN ('CONFIRMED', 'CANCELLED'))
+);
+CREATE UNIQUE INDEX uq_activity_reservations_confirmed
+    ON activity_reservations(occurrence_id, user_id) WHERE status = 'CONFIRMED';
 
 -- ============================================================
 -- NEWS
@@ -474,6 +590,92 @@ CREATE TABLE current_plan_activities (
                                          CONSTRAINT fk_current_plan_activity_day
                                              FOREIGN KEY (active_day_id) REFERENCES days(id)
 );
+
+-- ============================================================
+-- PLAN EXECUTIONS
+--
+-- A user may execute each assigned plan once per local gym day. These
+-- records reflect actual activity only; their absence is never an absence
+-- or attendance signal. Items are copied as a snapshot at start time.
+-- ============================================================
+
+CREATE TABLE plan_executions (
+                                 id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+                                 user_plan_id BIGINT NOT NULL,
+                                 plan_day_id BIGINT NOT NULL,
+                                 execution_date DATE NOT NULL,
+                                 status VARCHAR(20) NOT NULL DEFAULT 'IN_PROGRESS',
+                                 started_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                 last_progress_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                 completed_at TIMESTAMPTZ,
+                                 total_items INTEGER NOT NULL,
+                                 completed_items INTEGER NOT NULL DEFAULT 0,
+                                 progress_percent INTEGER NOT NULL DEFAULT 0,
+
+                                 CONSTRAINT fk_plan_executions_user_plan
+                                     FOREIGN KEY (user_plan_id) REFERENCES user_plans(id),
+                                 CONSTRAINT fk_plan_executions_plan_day
+                                     FOREIGN KEY (plan_day_id) REFERENCES days(id),
+                                 CONSTRAINT uq_plan_executions_user_plan_date
+                                     UNIQUE (user_plan_id, execution_date),
+                                 CONSTRAINT chk_plan_executions_status
+                                     CHECK (status IN ('IN_PROGRESS', 'PARTIAL', 'COMPLETED')),
+                                 CONSTRAINT chk_plan_executions_total_items
+                                     CHECK (total_items > 0),
+                                 CONSTRAINT chk_plan_executions_completed_items
+                                     CHECK (completed_items BETWEEN 0 AND total_items),
+                                 CONSTRAINT chk_plan_executions_progress_percent
+                                     CHECK (progress_percent BETWEEN 0 AND 100),
+                                 CONSTRAINT chk_plan_executions_completed_state
+                                     CHECK ((status = 'COMPLETED') = (completed_items = total_items)),
+                                 CONSTRAINT chk_plan_executions_completed_at
+                                     CHECK ((status = 'COMPLETED') = (completed_at IS NOT NULL))
+);
+
+CREATE INDEX idx_plan_executions_date_status
+    ON plan_executions (execution_date, status);
+
+CREATE TABLE plan_execution_items (
+                                      id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+                                      execution_id BIGINT NOT NULL,
+                                      source_block_exercise_id BIGINT,
+                                      block_position INTEGER NOT NULL,
+                                      block_name VARCHAR(150),
+                                      block_laps INTEGER NOT NULL,
+                                      exercise_position INTEGER NOT NULL,
+                                      exercise_id BIGINT,
+                                      exercise_name VARCHAR(150) NOT NULL,
+                                      quantity_type_id BIGINT,
+                                      repetitions INTEGER,
+                                      quantity NUMERIC(10, 2),
+                                      is_completed BOOLEAN NOT NULL DEFAULT FALSE,
+                                      completed_at TIMESTAMPTZ,
+
+                                      CONSTRAINT fk_plan_execution_items_execution
+                                          FOREIGN KEY (execution_id) REFERENCES plan_executions(id) ON DELETE CASCADE,
+                                      CONSTRAINT fk_plan_execution_items_source_block_exercise
+                                          FOREIGN KEY (source_block_exercise_id) REFERENCES block_exercises(id) ON DELETE SET NULL,
+                                      CONSTRAINT fk_plan_execution_items_exercise
+                                          FOREIGN KEY (exercise_id) REFERENCES exercises(id) ON DELETE SET NULL,
+                                      CONSTRAINT fk_plan_execution_items_quantity_type
+                                          FOREIGN KEY (quantity_type_id) REFERENCES quantity_types(id) ON DELETE SET NULL,
+                                      CONSTRAINT chk_plan_execution_items_block_position
+                                          CHECK (block_position >= 0),
+                                      CONSTRAINT chk_plan_execution_items_block_laps
+                                          CHECK (block_laps > 0),
+                                      CONSTRAINT chk_plan_execution_items_exercise_position
+                                          CHECK (exercise_position >= 0),
+                                      CONSTRAINT chk_plan_execution_items_repetitions
+                                          CHECK (repetitions IS NULL OR repetitions > 0),
+                                      CONSTRAINT chk_plan_execution_items_quantity
+                                          CHECK (quantity IS NULL OR quantity > 0),
+                                      CONSTRAINT chk_plan_execution_items_completed_at
+                                          CHECK ((is_completed AND completed_at IS NOT NULL) OR (NOT is_completed AND completed_at IS NULL)),
+                                      CONSTRAINT uq_plan_execution_items_source
+                                          UNIQUE (execution_id, source_block_exercise_id)
+);
+
+CREATE INDEX idx_plan_execution_items_execution ON plan_execution_items (execution_id);
 
 -- ============================================================
 -- REGISTERS

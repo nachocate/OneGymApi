@@ -22,6 +22,7 @@ Authorization: Bearer <accessToken>
 {
   "plans": [
     {
+      "userPlanId": 1,
       "id": 1,
       "name": "Fuerza inicial",
       "isActive": true,
@@ -69,6 +70,7 @@ Authorization: Bearer <accessToken>
 | Campo | Tipo | Descripción |
 | --- | --- | --- |
 | `plans` | array | Planes activos del usuario. Puede ser `[]`. |
+| `plans[].userPlanId` | number | ID de la asignación del plan al usuario. Usarlo al iniciar una ejecución diaria; no confundirlo con `plans[].id`. |
 | `plans[].isActive` | boolean | Siempre `true` para los planes incluidos. |
 | `weeks[].isActive` | boolean | Indica si la semana es la seleccionada o contiene el día activo. |
 | `days[].isActive` | boolean | Indica si el día es el seleccionado en la actividad activa. |

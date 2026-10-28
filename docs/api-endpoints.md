@@ -36,6 +36,7 @@ El origen configurado puede realizar `GET`, `POST`, `PUT`, `DELETE` y el preflig
 | Lecturas administrativas por gym | `GET /gyms/{gymId}/members`, `/coaches`, `/business-hours`, `/plans`, `/exercises` |
 | Planificaciones atómicas | [`GET /gyms/{gymId}/plans/{planId}/structure`, `POST/PUT /gyms/{gymId}/plans`, clone y asignaciones](endpoints/planifications/planifications-endpoints.md) |
 | Administración de entrenadores | [`GET /gyms/{gymId}/coaches/details` y `POST|PUT|DELETE /gyms/{gymId}/coaches`](endpoints/gym-coaches/dashboard-gym-coaches-endpoints.md) y [guía de dashboard](frontend-dashboard-coaches-v2-guide.md) |
+| Actividades y grupos | [`/gyms/{gymId}/activities`, grupos, calendario y reservas](endpoints/activities/activities-endpoints.md) |
 | Archivos de imagen | [`POST /gyms/{gymId}/uploads/images`](endpoints/images/image-upload-endpoints.md) |
 | CRUD | Usuarios, gimnasios, membresías, entrenadores, contenido, planes y evaluaciones |
 
@@ -268,6 +269,7 @@ Ejemplo: `GET /plan/1/me`. Devuelve las rutinas activas asignadas al usuario en 
 {
   "plans": [
     {
+      "userPlanId": 1,
       "id": 1,
       "name": "Fuerza inicial",
       "isActive": true,
@@ -658,6 +660,12 @@ La documentación detallada se encuentra en [current-plan-activities-endpoints.m
 ```
 
 **Respuesta `GET /current-plan-activities/1`**: el mismo objeto incluyendo `"id": 1`. `activeWeekId` y `activeDayId` pueden ser `null`.
+
+### Ejecución diaria de rutinas — `/gyms/{gymId}/me/plan-executions`
+
+La documentación detallada está en [plan-executions-endpoints.md](endpoints/plan-executions/plan-executions-endpoints.md).
+
+Estos endpoints permiten al miembro registrar su avance real sobre una planificación asignada. La regla es una ejecución por `userPlanId` y día local del gimnasio; `userPlanId` se obtiene en `GET /plan/{gymId}/me` y no debe confundirse con el `id` del plan. No registrar una ejecución no equivale a una ausencia. El staff consulta historial y métricas mediante `/gyms/{gymId}/members/{userId}/plan-executions` y `/gyms/{gymId}/plan-execution-adherence`.
 
 ### Registros de ejercicio — `/registers`
 

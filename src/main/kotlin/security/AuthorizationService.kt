@@ -1,6 +1,6 @@
 package com.concatstudio.onegym.security
 
-import com.concatstudio.onegym.data.SystemRoles
+import com.concatstudio.onegym.data.*
 import com.concatstudio.onegym.data.UserGyms
 import com.concatstudio.onegym.data.UserRoles
 import com.concatstudio.onegym.data.UserSystemRoles
@@ -55,6 +55,17 @@ class AuthorizationService {
 
     fun canManageTraining(userId: Long, gymId: Long): Boolean =
         isSuperAdmin(userId) || (gymRole(userId, gymId)?.rank ?: 0) >= GymRole.COACH.rank
+
+    fun canManageActivity(userId: Long, activityId: Long): Boolean {
+        if (isSuperAdmin(userId)) return true
+        return transaction(Database.connection) {
+            val activity = Activities.selectAll().where { Activities.id eq activityId }.singleOrNull() ?: return@transaction false
+            if ((gymRole(userId, activity[Activities.gym].value)?.rank ?: 0) >= GymRole.ADMIN.rank) return@transaction true
+            ActivityScheduleInstructors.innerJoin(ActivitySchedules).innerJoin(GymCoaches).selectAll().where {
+                (ActivitySchedules.activity eq activityId) and (GymCoaches.user eq userId)
+            }.any()
+        }
+    }
 
     fun hasActiveGymMembership(userId: Long, gymId: Long): Boolean = transaction(Database.connection) {
         val today = LocalDate.now()
