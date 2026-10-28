@@ -468,24 +468,55 @@ INSERT INTO user_tests (
 -- ============================================================
 
 INSERT INTO activities (gym_id, title, description, banner_url, participation_mode, status, is_visible, default_max_capacity)
-VALUES (1, 'Boxeo funcional', 'Clases regulares de boxeo con grupos y cupos de prueba.', NULL, 'HYBRID', 'ACTIVE', TRUE, 15);
+VALUES
+    (1, 'Boxeo funcional', 'Clases regulares de boxeo con grupos y cupos de prueba.', NULL, 'HYBRID', 'ACTIVE', TRUE, 15),
+    (1, 'Zumba al aire libre', 'Clase abierta de baile y acondicionamiento al aire libre.', NULL, 'OPEN', 'ACTIVE', TRUE, NULL),
+    (1, 'Preparacion competitiva', 'Entrenamiento tecnico para deportistas con ingreso por solicitud.', NULL, 'GROUP_ONLY', 'ACTIVE', TRUE, 12),
+    (1, 'Pilates controlado', 'Trabajo de movilidad, postura y fuerza en grupos reducidos.', NULL, 'HYBRID', 'ACTIVE', TRUE, 8),
+    (1, 'Cross training', 'Entrenamiento funcional de intensidad adaptable, con reserva puntual.', NULL, 'OPEN', 'ACTIVE', TRUE, 20);
 
 INSERT INTO activity_schedules (activity_id, day_of_week, starts_at, ends_at, max_capacity, active_from)
 VALUES
     (1, 2, '17:00', '18:00', 15, CURRENT_DATE),
-    (1, 4, '17:00', '18:00', 15, CURRENT_DATE);
+    (1, 4, '17:00', '18:00', 15, CURRENT_DATE),
+    (2, 1, '19:00', '20:00', NULL, CURRENT_DATE),
+    (2, 3, '19:00', '20:00', NULL, CURRENT_DATE),
+    (3, 2, '07:00', '08:30', 12, CURRENT_DATE),
+    (3, 4, '07:00', '08:30', 12, CURRENT_DATE),
+    (4, 1, '09:00', '10:00', 8, CURRENT_DATE),
+    (4, 3, '09:00', '10:00', 8, CURRENT_DATE),
+    (5, 2, '18:30', '19:30', 20, CURRENT_DATE),
+    (5, 4, '18:30', '19:30', 20, CURRENT_DATE),
+    (5, 6, '10:00', '11:00', 20, CURRENT_DATE);
 
 INSERT INTO activity_schedule_instructors (schedule_id, gym_coach_id)
-VALUES (1, 1), (2, 1);
+VALUES
+    (1, 1), (2, 1),
+    (3, 1), (4, 1),
+    (5, 1), (6, 1),
+    (7, 1), (8, 1),
+    (9, 1), (10, 1), (11, 1);
 
 INSERT INTO activity_groups (activity_id, name, join_policy, status, max_members)
-VALUES (1, 'Boxeo Mar-Jue 17 hs', 'OPEN', 'ACTIVE', 10);
+VALUES
+    (1, 'Boxeo Mar-Jue 17 hs', 'OPEN', 'ACTIVE', 10),
+    (3, 'Competitivo Mar-Jue 7 hs', 'REQUEST_ONLY', 'ACTIVE', 12),
+    (4, 'Pilates Lun-Mie 9 hs', 'OPEN', 'ACTIVE', 8);
 
 INSERT INTO activity_group_schedules (group_id, schedule_id)
-VALUES (1, 1), (1, 2);
+VALUES
+    (1, 1), (1, 2),
+    (2, 5), (2, 6),
+    (3, 7), (3, 8);
 
 INSERT INTO activity_group_memberships (group_id, user_id, start_date)
-VALUES (1, 1, CURRENT_DATE);
+VALUES
+    (1, 1, CURRENT_DATE),
+    (3, 1, CURRENT_DATE);
+
+-- Sofia is also waiting for approval in the closed competitive group.
+INSERT INTO activity_group_join_requests (group_id, user_id, status)
+VALUES (2, 1, 'PENDING');
 
 -- Keep identity sequences ahead of the explicit test IDs.
 SELECT setval(pg_get_serial_sequence('user_roles', 'id'), COALESCE((SELECT MAX(id) FROM user_roles), 1), true);
@@ -523,5 +554,6 @@ SELECT setval(pg_get_serial_sequence('activity_schedule_instructors', 'id'), COA
 SELECT setval(pg_get_serial_sequence('activity_groups', 'id'), COALESCE((SELECT MAX(id) FROM activity_groups), 1), true);
 SELECT setval(pg_get_serial_sequence('activity_group_schedules', 'id'), COALESCE((SELECT MAX(id) FROM activity_group_schedules), 1), true);
 SELECT setval(pg_get_serial_sequence('activity_group_memberships', 'id'), COALESCE((SELECT MAX(id) FROM activity_group_memberships), 1), true);
+SELECT setval(pg_get_serial_sequence('activity_group_join_requests', 'id'), COALESCE((SELECT MAX(id) FROM activity_group_join_requests), 1), true);
 
 COMMIT;

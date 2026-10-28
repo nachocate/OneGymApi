@@ -6,6 +6,8 @@ La referencia completa de paths y payloads está en [api-endpoints.md](api-endpo
 
 Para implementar el seguimiento de cada sesión de rutina, usar la guía específica: [frontend-cmp-plan-executions-guide.md](frontend-cmp-plan-executions-guide.md).
 
+Para el catálogo, inscripción y salida personal de actividades, usar [frontend-cmp-activities-guide.md](frontend-cmp-activities-guide.md).
+
 ## Alcance de la aplicación móvil
 
 La app móvil debe permitir al usuario autenticado:
@@ -17,8 +19,9 @@ La app móvil debe permitir al usuario autenticado:
 - consultar las rutinas activas preparadas para él por los coaches;
 - consultar sus propias evaluaciones y tests cuando esas pantallas estén habilitadas;
 - iniciar una rutina asignada y registrar el avance de sus ejercicios durante el día.
+- consultar actividades del gimnasio y administrar únicamente sus propias inscripciones o solicitudes de ingreso a grupos.
 
-No debe mostrar acciones administrativas ni consumir endpoints `POST`, `PUT` o `DELETE` de recursos de negocio, salvo los endpoints personales de ejecución de rutina documentados aquí.
+No debe mostrar acciones administrativas ni consumir endpoints `POST`, `PUT` o `DELETE` de recursos de negocio, salvo los endpoints personales de ejecución de rutina y actividades documentados aquí.
 
 ## 1. Organización CMP recomendada
 
@@ -111,6 +114,9 @@ Guardar `selectedGymId` en el estado de la aplicación, verificando que siempre 
 | Mis tests | `GET /user-tests?userId={currentUserId}` | Tests del usuario autenticado. |
 | Ejecución de rutina | `POST /gyms/{gymId}/me/plan-executions` | Inicia o retoma la rutina elegida para hoy. |
 | Progreso e historial | `PATCH`/`GET /gyms/{gymId}/me/plan-executions...` | Marca ejercicios y consulta ejecuciones reales. |
+| Actividades | `GET /gyms/{gymId}/activities`, `GET .../groups` y `GET .../schedules` | Catálogo, grupos y horarios disponibles del gimnasio. |
+| Mis actividades | `GET /gyms/{gymId}/me/activities` | Grupos activos a los que pertenece el usuario. |
+| Inscripción personal | `POST .../memberships/me`, `POST .../join-requests`, `DELETE .../me` | Unirse, solicitar acceso o salir del propio grupo. |
 
 ## 6. Ejecución de rutina personal
 

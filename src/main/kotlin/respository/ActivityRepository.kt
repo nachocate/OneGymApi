@@ -8,8 +8,15 @@ interface ActivityRepository {
     fun create(gymId: Long, request: SaveActivityRequest): ActivityResponse
     fun update(gymId: Long, activityId: Long, request: SaveActivityRequest): ActivityResponse
     fun createSchedule(gymId: Long, activityId: Long, request: SaveActivityScheduleRequest): ActivityScheduleResponse
+    fun listSchedules(gymId: Long, activityId: Long): List<ActivityScheduleResponse>
+    fun updateSchedule(gymId: Long, activityId: Long, scheduleId: Long, request: SaveActivityScheduleRequest): ActivityScheduleResponse
+    fun deleteSchedule(gymId: Long, activityId: Long, scheduleId: Long)
     fun createGroup(gymId: Long, activityId: Long, request: SaveActivityGroupRequest): ActivityGroupResponse
     fun listGroups(gymId: Long, activityId: Long): List<ActivityGroupResponse>
+    fun updateGroup(gymId: Long, activityId: Long, groupId: Long, request: SaveActivityGroupRequest): ActivityGroupResponse
+    fun archiveGroup(gymId: Long, activityId: Long, groupId: Long)
+    fun listMyActivities(gymId: Long, userId: Long): List<MemberActivityResponse>
+    fun leaveGroup(gymId: Long, membershipId: Long, userId: Long)
     fun joinOpenGroup(gymId: Long, groupId: Long, userId: Long): ActivityGroupMembershipResponse
     fun requestJoin(gymId: Long, groupId: Long, userId: Long): ActivityJoinRequestResponse
     fun approveRequest(gymId: Long, requestId: Long, reviewerId: Long): ActivityGroupMembershipResponse

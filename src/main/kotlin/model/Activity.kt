@@ -14,6 +14,7 @@ import kotlinx.serialization.Serializable
 @Serializable data class SaveActivityGroupRequest(val name: String, val joinPolicy: ActivityGroupJoinPolicy, val status: ActivityGroupStatus = ActivityGroupStatus.ACTIVE, val maxMembers: Int? = null, val scheduleIds: List<Long>)
 @Serializable data class ActivityGroupResponse(val id: Long, val activityId: Long, val name: String, val joinPolicy: ActivityGroupJoinPolicy, val status: ActivityGroupStatus, val maxMembers: Int?, val scheduleIds: List<Long>, val activeMemberCount: Int)
 @Serializable data class ActivityGroupMembershipResponse(val id: Long, val groupId: Long, val userId: Long, val startDate: String, val endDate: String?)
+@Serializable data class MemberActivityResponse(val activity: ActivityResponse, val group: ActivityGroupResponse, val membership: ActivityGroupMembershipResponse)
 @Serializable data class TransferActivityGroupMembershipRequest(val targetGroupId: Long, val effectiveFrom: String? = null)
 @Serializable data class ActivityJoinRequestResponse(val id: Long, val groupId: Long, val userId: Long, val status: String, val requestedAt: String)
 @Serializable data class ActivityOccurrenceResponse(val id: Long, val activityId: Long, val scheduleId: Long, val occurrenceDate: String, val startsAt: String, val endsAt: String, val maxCapacity: Int?, val status: String, val groupReservedSeats: Int, val confirmedReservations: Int, val availableSeats: Int?)

@@ -37,18 +37,44 @@ class ActivityRepositoryImp : ActivityRepository {
     }
 
     override fun createSchedule(gymId: Long, activityId: Long, request: SaveActivityScheduleRequest) = transaction(Database.connection) {
-        activityRow(gymId, activityId); require(request.instructorGymCoachIds.isNotEmpty()) { "A schedule requires at least one instructor" }
-        val day = request.dayOfWeek.toShort(); require(day in 1..7) { "dayOfWeek must be between 1 and 7" }
-        val starts = parseTime(request.startsAt); val ends = parseTime(request.endsAt); require(ends > starts) { "endsAt must be after startsAt" }
-        val from = parseDate(request.activeFrom); val until = request.activeUntil?.let(::parseDate); require(until == null || !until.isBefore(from)) { "activeUntil cannot precede activeFrom" }
-        validateCapacity(request.maxCapacity)
-        request.instructorGymCoachIds.distinct().forEach { coachId ->
-            val coach = GymCoaches.selectAll().where { GymCoaches.id eq coachId }.singleOrNull() ?: throw DomainNotFoundException("Gym coach not found")
-            require(coach[GymCoaches.gym].value == gymId) { "Instructor must belong to the gym" }
-        }
-        val id = ActivitySchedules.insert { it[activity] = EntityID(activityId, Activities); it[dayOfWeek] = day; it[startsAt] = starts; it[endsAt] = ends; it[maxCapacity] = request.maxCapacity; it[activeFrom] = from; it[activeUntil] = until } get ActivitySchedules.id
+        activityRow(gymId, activityId); val values = validateSchedule(gymId, request)
+        val id = ActivitySchedules.insert { it[activity] = EntityID(activityId, Activities); it[dayOfWeek] = values.dayOfWeek; it[startsAt] = values.startsAt; it[endsAt] = values.endsAt; it[maxCapacity] = request.maxCapacity; it[activeFrom] = values.activeFrom; it[activeUntil] = values.activeUntil } get ActivitySchedules.id
         request.instructorGymCoachIds.distinct().forEach { coachId -> ActivityScheduleInstructors.insert { it[schedule] = id; it[gymCoach] = EntityID(coachId, GymCoaches) } }
         schedule(id)
+    }
+
+    override fun listSchedules(gymId: Long, activityId: Long) = transaction(Database.connection) {
+        activityRow(gymId, activityId)
+        ActivitySchedules.selectAll().where { ActivitySchedules.activity eq activityId }
+            .orderBy(ActivitySchedules.dayOfWeek to SortOrder.ASC, ActivitySchedules.startsAt to SortOrder.ASC)
+            .map { schedule(it[ActivitySchedules.id]) }
+    }
+
+    override fun updateSchedule(gymId: Long, activityId: Long, scheduleId: Long, request: SaveActivityScheduleRequest) = transaction(Database.connection) {
+        scheduleRow(gymId, activityId, scheduleId)
+        val values = validateSchedule(gymId, request)
+        ActivitySchedules.update({ ActivitySchedules.id eq scheduleId }) {
+            it[dayOfWeek] = values.dayOfWeek; it[startsAt] = values.startsAt; it[endsAt] = values.endsAt
+            it[maxCapacity] = request.maxCapacity; it[activeFrom] = values.activeFrom; it[activeUntil] = values.activeUntil
+        }
+        ActivityScheduleInstructors.deleteWhere { ActivityScheduleInstructors.schedule eq scheduleId }
+        request.instructorGymCoachIds.distinct().forEach { coachId ->
+            ActivityScheduleInstructors.insert { it[schedule] = EntityID(scheduleId, ActivitySchedules); it[gymCoach] = EntityID(coachId, GymCoaches) }
+        }
+        schedule(EntityID(scheduleId, ActivitySchedules))
+    }
+
+    override fun deleteSchedule(gymId: Long, activityId: Long, scheduleId: Long) = transaction(Database.connection) {
+        scheduleRow(gymId, activityId, scheduleId)
+        if (ActivityGroupSchedules.selectAll().where { ActivityGroupSchedules.schedule eq scheduleId }.any()) {
+            throw DomainConflictException("The schedule is used by one or more groups")
+        }
+        if (ActivityOccurrences.selectAll().where { ActivityOccurrences.schedule eq scheduleId }.any()) {
+            throw DomainConflictException("The schedule already has generated occurrences and cannot be deleted")
+        }
+        ActivityScheduleInstructors.deleteWhere { ActivityScheduleInstructors.schedule eq scheduleId }
+        ActivitySchedules.deleteWhere { ActivitySchedules.id eq scheduleId }
+        Unit
     }
 
     override fun createGroup(gymId: Long, activityId: Long, request: SaveActivityGroupRequest) = transaction(Database.connection) {
@@ -61,6 +87,56 @@ class ActivityRepositoryImp : ActivityRepository {
     }
 
     override fun listGroups(gymId: Long, activityId: Long) = transaction(Database.connection) { activityRow(gymId, activityId); ActivityGroups.selectAll().where { ActivityGroups.activity eq activityId }.map { group(it[ActivityGroups.id]) } }
+
+    override fun updateGroup(gymId: Long, activityId: Long, groupId: Long, request: SaveActivityGroupRequest) = transaction(Database.connection) {
+        val current = groupRow(gymId, groupId)
+        require(current[ActivityGroups.activity].value == activityId) { "Activity group does not belong to this activity" }
+        validateGroup(gymId, activityId, request)
+        val existingScheduleIds = ActivityGroupSchedules.selectAll().where { ActivityGroupSchedules.group eq groupId }.map { it[ActivityGroupSchedules.schedule].value }.toSet()
+        val requestedScheduleIds = request.scheduleIds.distinct().toSet()
+        if (existingScheduleIds != requestedScheduleIds && ActivityGroupMemberships.selectAll().where { ActivityGroupMemberships.group eq groupId }.any()) {
+            throw DomainConflictException("A group with membership history cannot change its schedules")
+        }
+        val activeMembers = activeMemberCount(groupId)
+        if (request.maxMembers != null && request.maxMembers < activeMembers) throw DomainConflictException("The maximum members cannot be lower than the active membership count")
+        ActivityGroups.update({ ActivityGroups.id eq groupId }) { it[name] = request.name.trim(); it[joinPolicy] = request.joinPolicy.name; it[status] = request.status.name; it[maxMembers] = request.maxMembers }
+        if (existingScheduleIds != requestedScheduleIds) {
+            ActivityGroupSchedules.deleteWhere { ActivityGroupSchedules.group eq groupId }
+            requestedScheduleIds.forEach { scheduleId -> ActivityGroupSchedules.insert { it[group] = EntityID(groupId, ActivityGroups); it[schedule] = EntityID(scheduleId, ActivitySchedules) } }
+        }
+        group(EntityID(groupId, ActivityGroups))
+    }
+
+    override fun archiveGroup(gymId: Long, activityId: Long, groupId: Long) = transaction(Database.connection) {
+        val current = groupRow(gymId, groupId)
+        require(current[ActivityGroups.activity].value == activityId) { "Activity group does not belong to this activity" }
+        val today = gymLocalDate(gymId)
+        ActivityGroups.update({ ActivityGroups.id eq groupId }) { it[status] = ActivityGroupStatus.ARCHIVED.name }
+        ActivityGroupMemberships.update({ (ActivityGroupMemberships.group eq groupId) and ActivityGroupMemberships.endDate.isNull() }) { it[endDate] = today }
+        ActivityGroupJoinRequests.update({ (ActivityGroupJoinRequests.group eq groupId) and (ActivityGroupJoinRequests.status eq "PENDING") }) { it[status] = "CANCELLED"; it[reviewedAt] = OffsetDateTime.now(); it[reviewedByUser] = null }
+        Unit
+    }
+
+    override fun listMyActivities(gymId: Long, userId: Long) = transaction(Database.connection) {
+        ActivityGroupMemberships.innerJoin(ActivityGroups).innerJoin(Activities).selectAll().where {
+            (Activities.gym eq gymId) and (ActivityGroupMemberships.user eq userId) and ActivityGroupMemberships.endDate.isNull() and (ActivityGroups.status eq ActivityGroupStatus.ACTIVE.name)
+        }.orderBy(Activities.title to SortOrder.ASC, ActivityGroups.name to SortOrder.ASC).map { row ->
+            MemberActivityResponse(
+                activity = activity(row),
+                group = group(row[ActivityGroups.id]),
+                membership = ActivityGroupMembershipResponse(row[ActivityGroupMemberships.id].value, row[ActivityGroups.id].value, userId, row[ActivityGroupMemberships.startDate].toString(), null)
+            )
+        }
+    }
+
+    override fun leaveGroup(gymId: Long, membershipId: Long, userId: Long) = transaction(Database.connection) {
+        val membership = ActivityGroupMemberships.innerJoin(ActivityGroups).innerJoin(Activities).selectAll().where {
+            (ActivityGroupMemberships.id eq membershipId) and (ActivityGroupMemberships.user eq userId) and (Activities.gym eq gymId)
+        }.singleOrNull() ?: throw DomainNotFoundException("Group membership not found")
+        require(membership[ActivityGroupMemberships.endDate] == null) { "Group membership is no longer active" }
+        ActivityGroupMemberships.update({ ActivityGroupMemberships.id eq membershipId }) { it[endDate] = gymLocalDate(gymId).minusDays(1) }
+        Unit
+    }
 
     override fun joinOpenGroup(gymId: Long, groupId: Long, userId: Long) = transaction(Database.connection) {
         val group = groupRow(gymId, groupId); require(group[ActivityGroups.joinPolicy] == "OPEN") { "This group requires approval" }; require(group[ActivityGroups.status] == "ACTIVE") { "Group is not active" }
@@ -177,7 +253,27 @@ class ActivityRepositoryImp : ActivityRepository {
     private fun activeMemberCount(groupId: Long) = ActivityGroupMemberships.selectAll().where { (ActivityGroupMemberships.group eq groupId) and ActivityGroupMemberships.endDate.isNull() }.count().toInt()
     private fun isGroupRunning(groupId: Long, gymId: Long): Boolean { val now = OffsetDateTime.now(); return ActivityGroupSchedules.innerJoin(ActivitySchedules).innerJoin(Activities).innerJoin(Gyms).selectAll().where { (ActivityGroupSchedules.group eq groupId) and (Activities.gym eq gymId) }.any { schedule -> val zone = ZoneId.of(schedule[Gyms.timezone]); val today = LocalDate.now(zone); val start = ZonedDateTime.of(today, schedule[ActivitySchedules.startsAt], zone).toOffsetDateTime(); val end = ZonedDateTime.of(today, schedule[ActivitySchedules.endsAt], zone).toOffsetDateTime(); !now.isBefore(start) && now.isBefore(end) } }
     private fun validateActivity(r: SaveActivityRequest) { require(r.title.isNotBlank()) { "Title is required" }; validateCapacity(r.defaultMaxCapacity) }
+    private fun validateGroup(gymId: Long, activityId: Long, request: SaveActivityGroupRequest) {
+        val row = activityRow(gymId, activityId); require(row[Activities.participationMode] != "OPEN") { "OPEN activities cannot have groups" }
+        require(request.name.isNotBlank()) { "Group name is required" }; require(request.scheduleIds.isNotEmpty()) { "A group requires at least one schedule" }; validateCapacity(request.maxMembers)
+        request.scheduleIds.distinct().forEach { scheduleId -> require(scheduleBelongsToActivity(scheduleId, activityId)) { "Schedule must belong to the activity" } }
+    }
+    private fun validateSchedule(gymId: Long, request: SaveActivityScheduleRequest): ScheduleValues {
+        require(request.instructorGymCoachIds.isNotEmpty()) { "A schedule requires at least one instructor" }
+        val day = request.dayOfWeek.toShort(); require(day in 1..7) { "dayOfWeek must be between 1 and 7" }
+        val starts = parseTime(request.startsAt); val ends = parseTime(request.endsAt); require(ends > starts) { "endsAt must be after startsAt" }
+        val from = parseDate(request.activeFrom); val until = request.activeUntil?.let(::parseDate); require(until == null || !until.isBefore(from)) { "activeUntil cannot precede activeFrom" }
+        validateCapacity(request.maxCapacity)
+        request.instructorGymCoachIds.distinct().forEach { coachId ->
+            val coach = GymCoaches.selectAll().where { GymCoaches.id eq coachId }.singleOrNull() ?: throw DomainNotFoundException("Gym coach not found")
+            require(coach[GymCoaches.gym].value == gymId) { "Instructor must belong to the gym" }
+        }
+        return ScheduleValues(day, starts, ends, from, until)
+    }
     private fun validateCapacity(value: Int?) { require(value == null || value in 1..1000) { "Capacity must be between 1 and 1000" } }
     private fun parseDate(value: String) = runCatching { LocalDate.parse(value) }.getOrElse { throw IllegalArgumentException("Invalid date") }
     private fun parseTime(value: String) = runCatching { LocalTime.parse(value) }.getOrElse { throw IllegalArgumentException("Invalid time") }
+    private fun scheduleRow(gymId: Long, activityId: Long, scheduleId: Long) = ActivitySchedules.innerJoin(Activities).selectAll().where { (ActivitySchedules.id eq scheduleId) and (ActivitySchedules.activity eq activityId) and (Activities.gym eq gymId) }.singleOrNull() ?: throw DomainNotFoundException("Activity schedule not found")
+    private fun gymLocalDate(gymId: Long): LocalDate { val timezone = Gyms.selectAll().where { Gyms.id eq gymId }.singleOrNull()?.get(Gyms.timezone) ?: throw DomainNotFoundException("Gym not found"); return LocalDate.now(ZoneId.of(timezone)) }
+    private data class ScheduleValues(val dayOfWeek: Short, val startsAt: LocalTime, val endsAt: LocalTime, val activeFrom: LocalDate, val activeUntil: LocalDate?)
 }

@@ -2,6 +2,8 @@
 
 Esta guía cubre clases libres, grupos recurrentes y la modalidad híbrida.
 
+Para saber qué acciones de edición, desactivación o eliminación están disponibles hoy para horarios y grupos, consultar la [guía de ciclo de vida](frontend-dashboard-activity-lifecycle-guide.md). Horarios y grupos ya tienen rutas de gestión; la baja de grupo es lógica y conserva historial.
+
 ## Pantallas
 
 1. **Actividades:** listado por gimnasio y editor administrativo.
@@ -41,6 +43,19 @@ POST /gyms/{gymId}/activity-groups/{groupId}/join-requests
 ```
 
 No mostrar inscripción mientras el backend informe que una clase del grupo está en curso. Un `409` significa que no hay cupo o existe una inscripción activa.
+
+## Contratos de respuesta
+
+El catálogo `GET /gyms/{gymId}/activities` devuelve una lista de actividades con `id`, `gymId`, `title`, `description`, `bannerUrl`, `participationMode`, `status`, `isVisible` y `defaultMaxCapacity`.
+
+Los grupos se obtienen con `GET /gyms/{gymId}/activities/{activityId}/groups`. Cada grupo contiene `id`, `activityId`, `name`, `joinPolicy`, `status`, `maxMembers`, `scheduleIds` y `activeMemberCount`. Los ejemplos JSON completos se encuentran en la [documentación de endpoints](endpoints/activities/activities-endpoints.md).
+
+Las altas de inscripción y solicitud devuelven body con ID real:
+
+- `POST .../memberships/me` → `{ id, groupId, userId, startDate, endDate }`.
+- `POST .../join-requests` → `{ id, groupId, userId, status, requestedAt }`.
+
+No asumir `201` sin body: guardar el ID devuelto si la interfaz necesita referenciar la membresía.
 
 ## Gestión por coaches
 

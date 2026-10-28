@@ -1,6 +1,6 @@
 # OneGym API — documentación de endpoints
 
-Guía de integración para frontend basada en las rutas actualmente declaradas en la API. Para el equipo del dashboard administrativo, consultar la [guía de integración del dashboard](frontend-dashboard-guide.md). Para la app móvil de miembros Kotlin Multiplatform/Compose Multiplatform, consultar la [guía de consumo CMP](frontend-cmp-integration-guide.md).
+Guía de integración para frontend basada en las rutas actualmente declaradas en la API. Para el equipo del dashboard administrativo, consultar la [guía de integración del dashboard](frontend-dashboard-guide.md). Para la app móvil de miembros Kotlin Multiplatform/Compose Multiplatform, consultar la [guía de consumo CMP](frontend-cmp-integration-guide.md) y, para actividades, la [guía CMP de actividades](frontend-cmp-activities-guide.md).
 
 ## Convenciones generales
 
