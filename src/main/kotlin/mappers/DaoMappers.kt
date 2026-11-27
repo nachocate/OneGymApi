@@ -8,25 +8,39 @@ fun toModel(user: UserDao) = User(
     firstName = user.firstName,
     lastName = user.lastName,
     email = user.email,
-    password = user.password
+    password = user.password,
+    avatarUrl = user.avatarUrl,
+    phone = user.phone,
+    address = user.address
 )
 
 fun User.toResponse() = UserResponse(
     id = id,
     firstName = firstName,
     lastName = lastName,
-    email = email
+    email = email,
+    avatarUrl = avatarUrl,
+    phone = phone,
+    address = address
 )
 
 fun toModel(gym: GymDao) = Gym(
     id = gym.id.value,
     name = gym.name,
     description = gym.description,
-    schedule = gym.schedule,
+    localityId = gym.localityId.value,
     address = gym.address,
     phone = gym.phone,
     logoUrl = gym.logoUrl,
     bannerUrl = gym.bannerUrl
+)
+
+fun toModel(gymBusinessHour: GymBusinessHourDao) = GymBusinessHour(
+    id = gymBusinessHour.id.value,
+    gymId = gymBusinessHour.gymId.value,
+    dayOfWeek = gymBusinessHour.dayOfWeek,
+    opensAt = gymBusinessHour.opensAt.toString(),
+    closesAt = gymBusinessHour.closesAt.toString()
 )
 
 fun toModel(role: UserRoleDao) = UserRole(role.id.value, role.name)
@@ -40,12 +54,22 @@ fun toModel(userGym: UserGymDao) = UserGym(
     endDate = userGym.endDate?.toString()
 )
 
+fun toModel(gymCoach: GymCoachDao) = GymCoach(
+    id = gymCoach.id.value,
+    userId = gymCoach.userId.value,
+    gymId = gymCoach.gymId.value,
+    coachTypeId = gymCoach.coachTypeId.value,
+    startDate = gymCoach.startDate.toString(),
+    endDate = gymCoach.endDate?.toString()
+)
+
 fun toModel(news: NewsDao) = News(
     id = news.id.value,
     gymId = news.gymId.value,
     title = news.title,
     description = news.description,
-    date = news.date.toString()
+    date = news.date.toString(),
+    imageUrl = news.imageUrl
 )
 
 fun toModel(planType: PlanTypeDao) = PlanType(planType.id.value, planType.name)
@@ -75,7 +99,17 @@ fun toModel(exercise: ExerciseDao) = Exercise(
     name = exercise.name,
     description = exercise.description,
     videoUrl = exercise.videoUrl,
-    imageUrl = exercise.imageUrl
+    imageUrl = exercise.imageUrl,
+    gymId = exercise.gymId?.value,
+    isVisibleGlobal = exercise.isVisibleGlobal
+)
+
+fun toModel(evaluation: EvaluationDao) = Evaluation(
+    id = evaluation.id.value,
+    userId = evaluation.userId.value,
+    name = evaluation.name,
+    description = evaluation.description,
+    creationDate = evaluation.creationDate.toString()
 )
 
 fun toModel(quantityType: QuantityTypeDao) = QuantityType(
@@ -112,7 +146,8 @@ fun toModel(activity: CurrentPlanActivityDao) = CurrentPlanActivity(
     date = activity.date.toString(),
     userPlanId = activity.userPlanId.value,
     activeWeekId = activity.activeWeekId?.value,
-    activeDayId = activity.activeDayId?.value
+    activeDayId = activity.activeDayId?.value,
+    isActive = activity.isActive
 )
 
 fun toModel(register: RegisterDao) = Register(
@@ -127,6 +162,7 @@ fun toModel(test: UserTestDao) = UserTest(
     id = test.id.value,
     exerciseId = test.exerciseId.value,
     userId = test.userId.value,
+    evaluationId = test.evaluationId.value,
     quantityTypeId = test.quantityTypeId?.value,
     repetitions = test.repetitions,
     quantity = test.quantity?.toDouble(),

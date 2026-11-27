@@ -10,65 +10,129 @@ BEGIN;
 -- ============================================================
 
 INSERT INTO user_roles (id, name) OVERRIDING SYSTEM VALUE VALUES
-    (1, 'User'),
-    (2, 'Admin'),
-    (3, 'SuperAdmin');
+    (1, 'MEMBER'),
+    (2, 'COACH'),
+    (3, 'ADMIN'),
+    (4, 'OWNER');
+
+INSERT INTO system_roles (id, name) OVERRIDING SYSTEM VALUE VALUES
+    (1, 'SUPER_ADMIN');
+
+-- ============================================================
+-- COACH TYPES
+-- ============================================================
+
+INSERT INTO coach_types (id, name) OVERRIDING SYSTEM VALUE VALUES
+    (1, 'headCoach'),
+    (2, 'coach'),
+    (3, 'assistant');
 
 -- ============================================================
 -- USERS
 -- BCrypt hash of: password
 -- ============================================================
 
-INSERT INTO users (id, email, password, avatar_url, firstname, lastname)
+INSERT INTO users (id, email, password, avatar_url, firstname, lastname, phone, address)
 OVERRIDING SYSTEM VALUE VALUES
-    (1, 'sofia@onegym.test', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', NULL, 'Sofia', 'Martinez'),
-    (2, 'lucas@onegym.test', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', NULL, 'Lucas', 'Fernandez'),
-    (3, 'valentina@onegym.test', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', NULL, 'Valentina', 'Gomez'),
-    (4, 'admin@onegym.test', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', NULL, 'Martin', 'Administrador');
+    (1, 'sofia@onegym.test', '$2a$12$lRjI71wrqakSjaVFLQZSZ.xmq2.wn6LbBGQgJWSGndpobIG0ygwl6', NULL, 'Sofia', 'Martinez', '+54 11 5555-0101', 'Av. Siempre Viva 123'),
+    (2, 'lucas@onegym.test', '$2a$12$lRjI71wrqakSjaVFLQZSZ.xmq2.wn6LbBGQgJWSGndpobIG0ygwl6', NULL, 'Lucas', 'Fernandez', '+54 11 5555-0102', 'Av. Siempre Viva 124'),
+    (3, 'valentina@onegym.test', '$2a$12$lRjI71wrqakSjaVFLQZSZ.xmq2.wn6LbBGQgJWSGndpobIG0ygwl6', NULL, 'Valentina', 'Gomez', '+54 11 5555-0103', 'Av. Siempre Viva 125'),
+    (4, 'admin@onegym.test', '$2a$12$lRjI71wrqakSjaVFLQZSZ.xmq2.wn6LbBGQgJWSGndpobIG0ygwl6', NULL, 'Martin', 'Administrador', '+54 11 5555-0104', 'Av. Siempre Viva 126'),
+    (5, 'camila@onegym.test', '$2a$12$lRjI71wrqakSjaVFLQZSZ.xmq2.wn6LbBGQgJWSGndpobIG0ygwl6', NULL, 'Camila', 'Rodriguez', '+54 11 5555-0105', 'Av. Siempre Viva 127'),
+    (6, 'tomas@onegym.test', '$2a$12$lRjI71wrqakSjaVFLQZSZ.xmq2.wn6LbBGQgJWSGndpobIG0ygwl6', NULL, 'Tomas', 'Lopez', '+54 11 5555-0106', 'Av. Siempre Viva 128'),
+    (7, 'julieta@onegym.test', '$2a$12$lRjI71wrqakSjaVFLQZSZ.xmq2.wn6LbBGQgJWSGndpobIG0ygwl6', NULL, 'Julieta', 'Sanchez', '+54 11 5555-0107', 'Av. Siempre Viva 129'),
+    (8, 'diego@onegym.test', '$2a$12$lRjI71wrqakSjaVFLQZSZ.xmq2.wn6LbBGQgJWSGndpobIG0ygwl6', NULL, 'Diego', 'Romero', '+54 11 5555-0108', 'Av. Siempre Viva 130'),
+    (9, 'paula@onegym.test', '$2a$12$lRjI71wrqakSjaVFLQZSZ.xmq2.wn6LbBGQgJWSGndpobIG0ygwl6', NULL, 'Paula', 'Diaz', '+54 11 5555-0109', 'Av. Siempre Viva 131'),
+    (10, 'nicolas@onegym.test', '$2a$12$lRjI71wrqakSjaVFLQZSZ.xmq2.wn6LbBGQgJWSGndpobIG0ygwl6', NULL, 'Nicolas', 'Silva', '+54 11 5555-0110', 'Av. Siempre Viva 132');
 
 -- ============================================================
--- GYM
+-- GEOGRAPHIC CATALOGS AND GYM
 -- ============================================================
 
-INSERT INTO gyms (id, name, description, schedule, address, phone, logo_url, banner_url)
-OVERRIDING SYSTEM VALUE VALUES
-    (1, 'Forze Gym', 'Gimnasio de entrenamiento funcional y fuerza.', 'Lunes a viernes 07:00-22:00; sábados 09:00-14:00', 'Av. Siempre Viva 123', '+54 11 5555-0101', NULL, NULL);
+INSERT INTO countries (id, name, iso_code) OVERRIDING SYSTEM VALUE VALUES
+    (1, 'Argentina', 'AR');
 
-INSERT INTO user_gyms (id, id_user, id_gym, id_user_rol, start_date, end_date)
+INSERT INTO provinces (id, country_id, name) OVERRIDING SYSTEM VALUE VALUES
+    (1, 1, 'Buenos Aires');
+
+INSERT INTO localities (id, province_id, name) OVERRIDING SYSTEM VALUE VALUES
+    (1, 1, 'La Plata');
+
+INSERT INTO gyms (id, name, description, locality_id, address, phone, logo_url, banner_url)
+OVERRIDING SYSTEM VALUE VALUES
+    (1, 'Forze Gym', 'Gimnasio de entrenamiento funcional y fuerza.', 1, 'Av. Siempre Viva 123', '+54 11 5555-0101', NULL, NULL);
+
+-- Informational only; these values do not restrict API operations.
+INSERT INTO gym_business_hours (id, gym_id, day_of_week, opens_at, closes_at)
+OVERRIDING SYSTEM VALUE VALUES
+    (1, 1, 1, '07:00', '22:00'),
+    (2, 1, 2, '07:00', '22:00'),
+    (3, 1, 3, '07:00', '22:00'),
+    (4, 1, 4, '07:00', '22:00'),
+    (5, 1, 5, '07:00', '22:00'),
+    (6, 1, 6, '09:00', '14:00');
+
+INSERT INTO gym_subscriptions (id, gym_id, start_date, expires_at, is_active)
+OVERRIDING SYSTEM VALUE VALUES
+    (1, 1, CURRENT_DATE - 365, NULL, TRUE);
+
+INSERT INTO user_gyms (id, user_id, gym_id, role_id, start_date, end_date)
 OVERRIDING SYSTEM VALUE VALUES
     (1, 1, 1, 1, CURRENT_DATE - 90, NULL),
     (2, 2, 1, 1, CURRENT_DATE - 60, NULL),
     (3, 3, 1, 1, CURRENT_DATE - 45, NULL),
-    (4, 4, 1, 3, CURRENT_DATE - 365, NULL);
+    (4, 4, 1, 4, CURRENT_DATE - 365, NULL),
+    (5, 5, 1, 3, CURRENT_DATE - 300, NULL),
+    (6, 6, 1, 1, CURRENT_DATE - 240, NULL),
+    (7, 7, 1, 1, CURRENT_DATE - 180, NULL),
+    (8, 8, 1, 1, CURRENT_DATE - 150, NULL),
+    (9, 9, 1, 1, CURRENT_DATE - 120, NULL),
+    (10, 10, 1, 1, CURRENT_DATE - 90, NULL);
+
+INSERT INTO user_system_roles (id, user_id, system_role_id)
+OVERRIDING SYSTEM VALUE VALUES
+    (1, 4, 1);
+
+INSERT INTO gym_coaches (id, user_id, gym_id, coach_type_id, start_date, end_date)
+OVERRIDING SYSTEM VALUE VALUES
+    (1, 2, 1, 1, CURRENT_DATE - 180, NULL),
+    (2, 3, 1, 2, CURRENT_DATE - 120, NULL),
+    (3, 5, 1, 1, CURRENT_DATE - 300, NULL),
+    (4, 6, 1, 2, CURRENT_DATE - 240, NULL),
+    (5, 7, 1, 2, CURRENT_DATE - 180, NULL),
+    (6, 8, 1, 3, CURRENT_DATE - 150, NULL),
+    (7, 9, 1, 3, CURRENT_DATE - 120, NULL),
+    -- Historical assignment: it remains in the database but is excluded from /{gymId}/home.
+    (8, 10, 1, 3, CURRENT_DATE - 180, CURRENT_DATE - 10);
 
 -- ============================================================
 -- NEWS
 -- ============================================================
 
-INSERT INTO news (id, id_gym, title, description, "date")
+INSERT INTO news (id, gym_id, title, description, image_url, "date")
 OVERRIDING SYSTEM VALUE VALUES
-    (1, 1, 'Nueva zona de peso libre', 'Incorporamos nuevas barras, discos y mancuernas para tus entrenamientos.', CURRENT_TIMESTAMP - INTERVAL '12 days'),
-    (2, 1, 'Clase especial de movilidad', 'El próximo sábado habrá una clase abierta de movilidad y recuperación.', CURRENT_TIMESTAMP - INTERVAL '9 days'),
-    (3, 1, 'Desafío Forze de agosto', 'Participá del desafío mensual y registrá tus mejores marcas.', CURRENT_TIMESTAMP - INTERVAL '6 days'),
-    (4, 1, 'Nuevos horarios de funcional', 'Agregamos turnos de entrenamiento funcional por la mañana.', CURRENT_TIMESTAMP - INTERVAL '3 days'),
-    (5, 1, 'Mantenimiento de vestuarios', 'Los vestuarios permanecerán cerrados el domingo de 08:00 a 12:00.', CURRENT_TIMESTAMP - INTERVAL '1 day');
+    (1, 1, 'Nueva zona de peso libre', 'Incorporamos nuevas barras, discos y mancuernas para tus entrenamientos.', NULL, CURRENT_TIMESTAMP - INTERVAL '12 days'),
+    (2, 1, 'Clase especial de movilidad', 'El próximo sábado habrá una clase abierta de movilidad y recuperación.', NULL, CURRENT_TIMESTAMP - INTERVAL '9 days'),
+    (3, 1, 'Desafío Forze de agosto', 'Participá del desafío mensual y registrá tus mejores marcas.', NULL, CURRENT_TIMESTAMP - INTERVAL '6 days'),
+    (4, 1, 'Nuevos horarios de funcional', 'Agregamos turnos de entrenamiento funcional por la mañana.', NULL, CURRENT_TIMESTAMP - INTERVAL '3 days'),
+    (5, 1, 'Mantenimiento de vestuarios', 'Los vestuarios permanecerán cerrados el domingo de 08:00 a 12:00.', NULL, CURRENT_TIMESTAMP - INTERVAL '1 day');
 
 -- ============================================================
 -- EXERCISES
 -- ============================================================
 
-INSERT INTO exercises (id, name, description, video_url, image_url)
+INSERT INTO exercises (id, name, description, video_url, image_url, gym_id, is_visible_global)
 OVERRIDING SYSTEM VALUE VALUES
-    (1, 'Sentadilla con barra', 'Sentadilla trasera con barra.', NULL, NULL),
-    (2, 'Press de banca', 'Press horizontal con barra.', NULL, NULL),
-    (3, 'Peso muerto', 'Peso muerto convencional.', NULL, NULL),
-    (4, 'Dominadas', 'Dominadas con agarre prono.', NULL, NULL),
-    (5, 'Burpees', 'Burpee completo con salto.', NULL, NULL),
-    (6, 'Zancadas', 'Zancadas alternadas con peso corporal.', NULL, NULL),
-    (7, 'Remo con mancuerna', 'Remo unilateral con mancuerna.', NULL, NULL),
-    (8, 'Plancha', 'Plancha isométrica frontal.', NULL, NULL),
-    (9, 'Kettlebell swing', 'Balanceo de kettlebell.', NULL, NULL),
-    (10, 'Carrera', 'Carrera continua o por intervalos.', NULL, NULL);
+    (1, 'Sentadilla con barra', 'Sentadilla trasera con barra.', NULL, NULL, NULL, TRUE),
+    (2, 'Press de banca', 'Press horizontal con barra.', NULL, NULL, NULL, TRUE),
+    (3, 'Peso muerto', 'Peso muerto convencional.', NULL, NULL, NULL, TRUE),
+    (4, 'Dominadas', 'Dominadas con agarre prono.', NULL, NULL, NULL, TRUE),
+    (5, 'Burpees', 'Burpee completo con salto.', NULL, NULL, NULL, TRUE),
+    (6, 'Zancadas', 'Zancadas alternadas con peso corporal.', NULL, NULL, NULL, TRUE),
+    (7, 'Remo con mancuerna', 'Remo unilateral con mancuerna.', NULL, NULL, 1, FALSE),
+    (8, 'Plancha', 'Plancha isométrica frontal.', NULL, NULL, NULL, TRUE),
+    (9, 'Kettlebell swing', 'Balanceo de kettlebell.', NULL, NULL, 1, FALSE),
+    (10, 'Carrera', 'Carrera continua o por intervalos.', NULL, NULL, NULL, TRUE);
 
 -- ============================================================
 -- QUANTITY TYPES
@@ -91,7 +155,7 @@ INSERT INTO plan_types (id, name) OVERRIDING SYSTEM VALUE VALUES
     (1, 'Generica'),
     (2, 'Personalizada');
 
-INSERT INTO plans (id, name, id_gym, id_plan_type, id_plan_root)
+INSERT INTO plans (id, name, gym_id, plan_type_id, plan_root_id)
 OVERRIDING SYSTEM VALUE VALUES
     (1, 'Sofia - Fuerza inicial', 1, 1, NULL),
     (2, 'Sofia - Progresion personal', 1, 2, NULL),
@@ -100,9 +164,21 @@ OVERRIDING SYSTEM VALUE VALUES
     (5, 'Valentina - Fuerza inicial', 1, 1, NULL),
     (6, 'Valentina - Progresion personal', 1, 2, NULL),
     (7, 'Martin - Fuerza inicial', 1, 1, NULL),
-    (8, 'Martin - Progresion personal', 1, 2, NULL);
+    (8, 'Martin - Progresion personal', 1, 2, NULL),
+    (9, 'Camila - Fuerza inicial', 1, 1, NULL),
+    (10, 'Camila - Progresion personal', 1, 2, NULL),
+    (11, 'Tomas - Fuerza inicial', 1, 1, NULL),
+    (12, 'Tomas - Progresion personal', 1, 2, NULL),
+    (13, 'Julieta - Fuerza inicial', 1, 1, NULL),
+    (14, 'Julieta - Progresion personal', 1, 2, NULL),
+    (15, 'Diego - Fuerza inicial', 1, 1, NULL),
+    (16, 'Diego - Progresion personal', 1, 2, NULL),
+    (17, 'Paula - Fuerza inicial', 1, 1, NULL),
+    (18, 'Paula - Progresion personal', 1, 2, NULL),
+    (19, 'Nicolas - Fuerza inicial', 1, 1, NULL),
+    (20, 'Nicolas - Progresion personal', 1, 2, NULL);
 
-INSERT INTO user_plans (id, id_user, id_plan) OVERRIDING SYSTEM VALUE VALUES
+INSERT INTO user_plans (id, user_id, plan_id) OVERRIDING SYSTEM VALUE VALUES
     (1, 1, 1),
     (2, 1, 2),
     (3, 2, 3),
@@ -110,7 +186,19 @@ INSERT INTO user_plans (id, id_user, id_plan) OVERRIDING SYSTEM VALUE VALUES
     (5, 3, 5),
     (6, 3, 6),
     (7, 4, 7),
-    (8, 4, 8);
+    (8, 4, 8),
+    (9, 5, 9),
+    (10, 5, 10),
+    (11, 6, 11),
+    (12, 6, 12),
+    (13, 7, 13),
+    (14, 7, 14),
+    (15, 8, 15),
+    (16, 8, 16),
+    (17, 9, 17),
+    (18, 9, 18),
+    (19, 10, 19),
+    (20, 10, 20);
 
 -- ============================================================
 -- WEEKS, DAYS, BLOCKS AND BLOCK EXERCISES
@@ -130,23 +218,23 @@ DECLARE
     block_position INTEGER;
     exercise_position INTEGER;
 BEGIN
-    FOR plan_id_value IN 1..8 LOOP
+    FOR plan_id_value IN 1..20 LOOP
         FOR week_number IN 1..2 LOOP
             week_id_value := (plan_id_value - 1) * 2 + week_number;
 
-            INSERT INTO weeks (id, number, id_plan)
+                INSERT INTO weeks (id, number, plan_id)
             OVERRIDING SYSTEM VALUE VALUES (week_id_value, week_number, plan_id_value);
 
             FOR day_number IN 1..2 LOOP
                 day_id_value := (week_id_value - 1) * 2 + day_number;
 
-                INSERT INTO days (id, number, id_week)
+                INSERT INTO days (id, number, week_id)
                 OVERRIDING SYSTEM VALUE VALUES (day_id_value, day_number, week_id_value);
 
                 FOR block_position IN 0..1 LOOP
                     block_id_value := (day_id_value - 1) * 2 + block_position + 1;
 
-                    INSERT INTO blocks (id, position, name, id_day, laps)
+                    INSERT INTO blocks (id, position, name, day_id, laps)
                     OVERRIDING SYSTEM VALUE VALUES (
                         block_id_value,
                         block_position,
@@ -160,7 +248,7 @@ BEGIN
 
                         IF exercise_position = 0 THEN
                             INSERT INTO block_exercises (
-                                id, id_block, id_exercise, id_quantity_type,
+                                id, block_id, exercise_id, quantity_type_id,
                                 position, repetitions, quantity
                             ) OVERRIDING SYSTEM VALUE VALUES (
                                 (block_id_value - 1) * 2 + exercise_position + 1,
@@ -173,7 +261,7 @@ BEGIN
                             );
                         ELSE
                             INSERT INTO block_exercises (
-                                id, id_block, id_exercise, id_quantity_type,
+                                id, block_id, exercise_id, quantity_type_id,
                                 position, repetitions, quantity
                             ) OVERRIDING SYSTEM VALUE VALUES (
                                 (block_id_value - 1) * 2 + exercise_position + 1,
@@ -193,54 +281,257 @@ BEGIN
 END $$;
 
 -- ============================================================
+-- PLAN EXECUTION HISTORY
+--
+-- Actual work completed by a member. Missing rows are deliberately not
+-- absences: plans can be used with free or variable attendance.
+-- ============================================================
+
+INSERT INTO plan_executions
+    (id, user_plan_id, plan_day_id, execution_date, status, started_at, last_progress_at, completed_at, total_items, completed_items, progress_percent)
+OVERRIDING SYSTEM VALUE VALUES
+    (1, 1, 1, CURRENT_DATE, 'PARTIAL', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, NULL, 4, 2, 50);
+
+INSERT INTO plan_execution_items
+    (id, execution_id, source_block_exercise_id, block_position, block_name, block_laps, exercise_position,
+     exercise_id, exercise_name, quantity_type_id, repetitions, quantity, is_completed, completed_at)
+OVERRIDING SYSTEM VALUE
+SELECT
+    ROW_NUMBER() OVER (ORDER BY b.position, be.position),
+    1,
+    be.id,
+    b.position,
+    b.name,
+    b.laps,
+    be.position,
+    e.id,
+    e.name,
+    be.quantity_type_id,
+    be.repetitions,
+    be.quantity,
+    be.position = 0,
+    CASE WHEN be.position = 0 THEN CURRENT_TIMESTAMP ELSE NULL END
+FROM blocks b
+JOIN block_exercises be ON be.block_id = b.id
+JOIN exercises e ON e.id = be.exercise_id
+WHERE b.day_id = 1
+ORDER BY b.position, be.position;
+
+-- ============================================================
 -- CURRENT PLAN ACTIVITIES
 -- ============================================================
 
 INSERT INTO current_plan_activities
-    (id, "date", id_user_plan, id_week_active, id_day_active)
+    (id, "date", user_plan_id, active_week_id, active_day_id, is_active)
 OVERRIDING SYSTEM VALUE VALUES
-    (1, CURRENT_TIMESTAMP, 1, 1, 1),
-    (2, CURRENT_TIMESTAMP, 3, 5, 9),
-    (3, CURRENT_TIMESTAMP, 5, 9, 17),
-    (4, CURRENT_TIMESTAMP, 7, 13, 25);
+    (1, CURRENT_TIMESTAMP, 1, 1, 1, TRUE),
+    (2, CURRENT_TIMESTAMP, 3, 5, 9, TRUE),
+    (3, CURRENT_TIMESTAMP, 5, 9, 17, TRUE),
+    (4, CURRENT_TIMESTAMP, 7, 13, 25, TRUE),
+    (5, CURRENT_TIMESTAMP, 9, 17, 33, TRUE),
+    (6, CURRENT_TIMESTAMP, 11, 21, 41, TRUE),
+    (7, CURRENT_TIMESTAMP, 13, 25, 49, TRUE),
+    (8, CURRENT_TIMESTAMP, 15, 29, 57, TRUE),
+    (9, CURRENT_TIMESTAMP, 17, 33, 65, TRUE),
+    (10, CURRENT_TIMESTAMP, 19, 37, 73, TRUE);
 
 -- ============================================================
 -- PROGRAMMED WEIGHTS / REGISTERS
 -- ============================================================
 
-INSERT INTO registers (id, id_user_plan, id_exercise, id_block, weight)
+INSERT INTO registers (id, user_plan_id, exercise_id, block_id, weight)
 OVERRIDING SYSTEM VALUE VALUES
     (1, 1, 1, 1, 40.00),
-    (2, 2, 2, 17, 45.00),
-    (3, 3, 3, 33, 50.00),
-    (4, 4, 4, 49, 55.00),
-    (5, 5, 5, 9, 60.00),
-    (6, 6, 6, 25, 65.00),
-    (7, 7, 7, 41, 70.00),
+    (2, 2, 9, 9, 45.00),
+    (3, 3, 7, 17, 50.00),
+    (4, 4, 5, 25, 55.00),
+    (5, 5, 3, 33, 60.00),
+    (6, 6, 1, 41, 65.00),
+    (7, 7, 9, 49, 70.00),
     (8, 8, 8, 57, 75.00);
 
 -- ============================================================
 -- USER TESTS
 -- ============================================================
 
+INSERT INTO evaluations (id, user_id, name, description, creation_date)
+OVERRIDING SYSTEM VALUE VALUES
+    (1, 1, 'Evaluacion inicial', 'Mediciones de ingreso de Sofia.', CURRENT_TIMESTAMP - INTERVAL '30 days'),
+    (2, 2, 'Evaluacion inicial', 'Mediciones de ingreso de Lucas.', CURRENT_TIMESTAMP - INTERVAL '25 days'),
+    (3, 3, 'Evaluacion de seguimiento', 'Mediciones de seguimiento de Valentina.', CURRENT_TIMESTAMP - INTERVAL '10 days'),
+    (4, 4, 'Evaluacion de seguimiento', 'Mediciones de seguimiento de Martin.', CURRENT_TIMESTAMP - INTERVAL '8 days'),
+    (5, 1, 'Evaluacion de seguimiento', 'Control de fuerza de Sofia a mitad de ciclo.', CURRENT_TIMESTAMP - INTERVAL '15 days'),
+    (6, 1, 'Evaluacion final de ciclo', 'Comparacion de fuerza de Sofia al cierre del ciclo.', CURRENT_TIMESTAMP - INTERVAL '3 days'),
+    (7, 2, 'Evaluacion de seguimiento', 'Control de progreso de Lucas.', CURRENT_TIMESTAMP - INTERVAL '7 days'),
+    (8, 3, 'Evaluacion de seguimiento', 'Segundo control de resistencia de Valentina.', CURRENT_TIMESTAMP - INTERVAL '2 days'),
+    (9, 2, 'Evaluacion final de ciclo', 'Comparacion final de fuerza de Lucas.', CURRENT_TIMESTAMP - INTERVAL '2 days'),
+    (10, 3, 'Evaluacion final de ciclo', 'Comparacion final de resistencia de Valentina.', CURRENT_TIMESTAMP - INTERVAL '1 day'),
+    (11, 4, 'Evaluacion inicial', 'Mediciones de ingreso de Martin.', CURRENT_TIMESTAMP - INTERVAL '30 days'),
+    (12, 4, 'Evaluacion final de ciclo', 'Comparacion de rendimiento de Martin.', CURRENT_TIMESTAMP - INTERVAL '1 day'),
+    (13, 5, 'Evaluacion inicial', 'Mediciones de ingreso de Camila.', CURRENT_TIMESTAMP - INTERVAL '30 days'),
+    (14, 5, 'Evaluacion de seguimiento', 'Control de fuerza de Camila.', CURRENT_TIMESTAMP - INTERVAL '15 days'),
+    (15, 5, 'Evaluacion final de ciclo', 'Comparacion final de fuerza de Camila.', CURRENT_TIMESTAMP - INTERVAL '2 days'),
+    (16, 6, 'Evaluacion inicial', 'Mediciones de ingreso de Tomas.', CURRENT_TIMESTAMP - INTERVAL '30 days'),
+    (17, 6, 'Evaluacion de seguimiento', 'Control de rendimiento de Tomas.', CURRENT_TIMESTAMP - INTERVAL '14 days'),
+    (18, 6, 'Evaluacion final de ciclo', 'Comparacion final de rendimiento de Tomas.', CURRENT_TIMESTAMP - INTERVAL '1 day'),
+    (19, 7, 'Evaluacion inicial', 'Mediciones de ingreso de Julieta.', CURRENT_TIMESTAMP - INTERVAL '30 days'),
+    (20, 7, 'Evaluacion de seguimiento', 'Control de resistencia de Julieta.', CURRENT_TIMESTAMP - INTERVAL '14 days'),
+    (21, 7, 'Evaluacion final de ciclo', 'Comparacion final de resistencia de Julieta.', CURRENT_TIMESTAMP - INTERVAL '1 day'),
+    (22, 8, 'Evaluacion inicial', 'Mediciones de ingreso de Diego.', CURRENT_TIMESTAMP - INTERVAL '30 days'),
+    (23, 8, 'Evaluacion de seguimiento', 'Control de fuerza de Diego.', CURRENT_TIMESTAMP - INTERVAL '14 days'),
+    (24, 8, 'Evaluacion final de ciclo', 'Comparacion final de fuerza de Diego.', CURRENT_TIMESTAMP - INTERVAL '1 day'),
+    (25, 9, 'Evaluacion inicial', 'Mediciones de ingreso de Paula.', CURRENT_TIMESTAMP - INTERVAL '30 days'),
+    (26, 9, 'Evaluacion de seguimiento', 'Control de potencia de Paula.', CURRENT_TIMESTAMP - INTERVAL '14 days'),
+    (27, 9, 'Evaluacion final de ciclo', 'Comparacion final de potencia de Paula.', CURRENT_TIMESTAMP - INTERVAL '1 day'),
+    (28, 10, 'Evaluacion inicial', 'Mediciones de ingreso de Nicolas.', CURRENT_TIMESTAMP - INTERVAL '30 days'),
+    (29, 10, 'Evaluacion de seguimiento', 'Control de capacidad aerobica de Nicolas.', CURRENT_TIMESTAMP - INTERVAL '14 days'),
+    (30, 10, 'Evaluacion final de ciclo', 'Comparacion final de capacidad aerobica de Nicolas.', CURRENT_TIMESTAMP - INTERVAL '1 day');
+
 INSERT INTO user_tests (
-    id, id_exercise, id_user, id_quantity_type,
+    id, exercise_id, user_id, evaluation_id, quantity_type_id,
     repetitions, quantity, "date", description
 ) OVERRIDING SYSTEM VALUE VALUES
-    (1, 1, 1, 5, 5, 60.00, CURRENT_TIMESTAMP - INTERVAL '30 days', 'Test inicial de sentadilla.'),
-    (2, 2, 1, 5, 5, 40.00, CURRENT_TIMESTAMP - INTERVAL '25 days', 'Test inicial de press de banca.'),
-    (3, 3, 2, 5, 5, 80.00, CURRENT_TIMESTAMP - INTERVAL '20 days', 'Test inicial de peso muerto.'),
-    (4, 4, 2, NULL, 8, NULL, CURRENT_TIMESTAMP - INTERVAL '15 days', 'Cantidad maxima de dominadas.'),
-    (5, 5, 3, NULL, 20, NULL, CURRENT_TIMESTAMP - INTERVAL '12 days', 'Test de burpees en un minuto.'),
-    (6, 6, 3, 5, 10, 20.00, CURRENT_TIMESTAMP - INTERVAL '10 days', 'Test de zancadas con carga.'),
-    (7, 9, 4, 5, 10, 16.00, CURRENT_TIMESTAMP - INTERVAL '8 days', 'Test de kettlebell swing.'),
-    (8, 10, 4, 4, NULL, 5.00, CURRENT_TIMESTAMP - INTERVAL '5 days', 'Test de carrera de cinco kilometros.');
+    (1, 1, 1, 1, 5, 5, 60.00, CURRENT_TIMESTAMP - INTERVAL '30 days', 'Test inicial de sentadilla.'),
+    (2, 2, 1, 1, 5, 5, 40.00, CURRENT_TIMESTAMP - INTERVAL '25 days', 'Test inicial de press de banca.'),
+    (3, 3, 2, 2, 5, 5, 80.00, CURRENT_TIMESTAMP - INTERVAL '20 days', 'Test inicial de peso muerto.'),
+    (4, 4, 2, 2, NULL, 8, NULL, CURRENT_TIMESTAMP - INTERVAL '15 days', 'Cantidad maxima de dominadas.'),
+    (5, 5, 3, 3, NULL, 20, NULL, CURRENT_TIMESTAMP - INTERVAL '12 days', 'Test de burpees en un minuto.'),
+    (6, 6, 3, 3, 5, 10, 20.00, CURRENT_TIMESTAMP - INTERVAL '10 days', 'Test de zancadas con carga.'),
+    (7, 9, 4, 4, 5, 10, 16.00, CURRENT_TIMESTAMP - INTERVAL '8 days', 'Test de kettlebell swing.'),
+    (8, 10, 4, 4, 4, NULL, 5.00, CURRENT_TIMESTAMP - INTERVAL '5 days', 'Test de carrera de cinco kilometros.'),
+    -- Same exercises across Sofia's three evaluations: enables strength progression charts.
+    (9, 1, 1, 5, 5, 5, 65.00, CURRENT_TIMESTAMP - INTERVAL '15 days', 'Seguimiento de sentadilla: mejora de carga.'),
+    (10, 2, 1, 5, 5, 5, 45.00, CURRENT_TIMESTAMP - INTERVAL '15 days', 'Seguimiento de press de banca: mejora de carga.'),
+    (11, 1, 1, 6, 5, 5, 70.00, CURRENT_TIMESTAMP - INTERVAL '3 days', 'Cierre de ciclo de sentadilla.'),
+    (12, 2, 1, 6, 5, 5, 50.00, CURRENT_TIMESTAMP - INTERVAL '3 days', 'Cierre de ciclo de press de banca.'),
+    -- Same exercises across Lucas's initial and follow-up evaluations.
+    (13, 3, 2, 7, 5, 5, 90.00, CURRENT_TIMESTAMP - INTERVAL '7 days', 'Seguimiento de peso muerto.'),
+    (14, 4, 2, 7, NULL, 10, NULL, CURRENT_TIMESTAMP - INTERVAL '7 days', 'Seguimiento de dominadas.'),
+    -- Same exercises across Valentina's two evaluations.
+    (15, 5, 3, 8, NULL, 25, NULL, CURRENT_TIMESTAMP - INTERVAL '2 days', 'Seguimiento de burpees en un minuto.'),
+    (16, 6, 3, 8, 5, 12, 22.50, CURRENT_TIMESTAMP - INTERVAL '2 days', 'Seguimiento de zancadas con carga.'),
+    -- Third measurement for Lucas and Valentina, using their same comparison exercises.
+    (17, 3, 2, 9, 5, 5, 95.00, CURRENT_TIMESTAMP - INTERVAL '2 days', 'Cierre de ciclo de peso muerto.'),
+    (18, 4, 2, 9, NULL, 12, NULL, CURRENT_TIMESTAMP - INTERVAL '2 days', 'Cierre de ciclo de dominadas.'),
+    (19, 5, 3, 10, NULL, 30, NULL, CURRENT_TIMESTAMP - INTERVAL '1 day', 'Cierre de ciclo de burpees.'),
+    (20, 6, 3, 10, 5, 15, 25.00, CURRENT_TIMESTAMP - INTERVAL '1 day', 'Cierre de ciclo de zancadas.'),
+    -- Martin: kettlebell swing and 5 km running progression.
+    (21, 9, 4, 11, 5, 8, 14.00, CURRENT_TIMESTAMP - INTERVAL '30 days', 'Test inicial de kettlebell swing.'),
+    (22, 10, 4, 11, 4, NULL, 5.50, CURRENT_TIMESTAMP - INTERVAL '30 days', 'Test inicial de carrera de cinco kilometros.'),
+    (23, 9, 4, 12, 5, 12, 18.00, CURRENT_TIMESTAMP - INTERVAL '1 day', 'Cierre de ciclo de kettlebell swing.'),
+    (24, 10, 4, 12, 4, NULL, 4.80, CURRENT_TIMESTAMP - INTERVAL '1 day', 'Cierre de ciclo de carrera de cinco kilometros.'),
+    -- Camila: squat and bench press progression.
+    (25, 1, 5, 13, 5, 5, 45.00, CURRENT_TIMESTAMP - INTERVAL '30 days', 'Test inicial de sentadilla.'),
+    (26, 2, 5, 13, 5, 5, 30.00, CURRENT_TIMESTAMP - INTERVAL '30 days', 'Test inicial de press de banca.'),
+    (27, 1, 5, 14, 5, 5, 52.50, CURRENT_TIMESTAMP - INTERVAL '15 days', 'Seguimiento de sentadilla.'),
+    (28, 2, 5, 14, 5, 5, 35.00, CURRENT_TIMESTAMP - INTERVAL '15 days', 'Seguimiento de press de banca.'),
+    (29, 1, 5, 15, 5, 5, 60.00, CURRENT_TIMESTAMP - INTERVAL '2 days', 'Cierre de ciclo de sentadilla.'),
+    (30, 2, 5, 15, 5, 5, 40.00, CURRENT_TIMESTAMP - INTERVAL '2 days', 'Cierre de ciclo de press de banca.'),
+    -- Tomas: deadlift and pull-up progression.
+    (31, 3, 6, 16, 5, 5, 70.00, CURRENT_TIMESTAMP - INTERVAL '30 days', 'Test inicial de peso muerto.'),
+    (32, 4, 6, 16, NULL, 5, NULL, CURRENT_TIMESTAMP - INTERVAL '30 days', 'Test inicial de dominadas.'),
+    (33, 3, 6, 17, 5, 5, 80.00, CURRENT_TIMESTAMP - INTERVAL '14 days', 'Seguimiento de peso muerto.'),
+    (34, 4, 6, 17, NULL, 8, NULL, CURRENT_TIMESTAMP - INTERVAL '14 days', 'Seguimiento de dominadas.'),
+    (35, 3, 6, 18, 5, 5, 90.00, CURRENT_TIMESTAMP - INTERVAL '1 day', 'Cierre de ciclo de peso muerto.'),
+    (36, 4, 6, 18, NULL, 10, NULL, CURRENT_TIMESTAMP - INTERVAL '1 day', 'Cierre de ciclo de dominadas.'),
+    -- Julieta: burpees and lunges progression.
+    (37, 5, 7, 19, NULL, 15, NULL, CURRENT_TIMESTAMP - INTERVAL '30 days', 'Test inicial de burpees.'),
+    (38, 6, 7, 19, 5, 8, 15.00, CURRENT_TIMESTAMP - INTERVAL '30 days', 'Test inicial de zancadas.'),
+    (39, 5, 7, 20, NULL, 22, NULL, CURRENT_TIMESTAMP - INTERVAL '14 days', 'Seguimiento de burpees.'),
+    (40, 6, 7, 20, 5, 10, 20.00, CURRENT_TIMESTAMP - INTERVAL '14 days', 'Seguimiento de zancadas.'),
+    (41, 5, 7, 21, NULL, 28, NULL, CURRENT_TIMESTAMP - INTERVAL '1 day', 'Cierre de ciclo de burpees.'),
+    (42, 6, 7, 21, 5, 12, 25.00, CURRENT_TIMESTAMP - INTERVAL '1 day', 'Cierre de ciclo de zancadas.'),
+    -- Diego: rowing and biceps curl progression.
+    (43, 7, 8, 22, 5, 8, 20.00, CURRENT_TIMESTAMP - INTERVAL '30 days', 'Test inicial de remo con mancuerna.'),
+    (44, 8, 8, 22, 5, 10, 12.00, CURRENT_TIMESTAMP - INTERVAL '30 days', 'Test inicial de curl de biceps.'),
+    (45, 7, 8, 23, 5, 10, 25.00, CURRENT_TIMESTAMP - INTERVAL '14 days', 'Seguimiento de remo con mancuerna.'),
+    (46, 8, 8, 23, 5, 12, 14.00, CURRENT_TIMESTAMP - INTERVAL '14 days', 'Seguimiento de curl de biceps.'),
+    (47, 7, 8, 24, 5, 12, 30.00, CURRENT_TIMESTAMP - INTERVAL '1 day', 'Cierre de ciclo de remo con mancuerna.'),
+    (48, 8, 8, 24, 5, 15, 16.00, CURRENT_TIMESTAMP - INTERVAL '1 day', 'Cierre de ciclo de curl de biceps.'),
+    -- Paula: kettlebell swing and 5 km running progression.
+    (49, 9, 9, 25, 5, 8, 12.00, CURRENT_TIMESTAMP - INTERVAL '30 days', 'Test inicial de kettlebell swing.'),
+    (50, 10, 9, 25, 4, NULL, 5.80, CURRENT_TIMESTAMP - INTERVAL '30 days', 'Test inicial de carrera de cinco kilometros.'),
+    (51, 9, 9, 26, 5, 10, 16.00, CURRENT_TIMESTAMP - INTERVAL '14 days', 'Seguimiento de kettlebell swing.'),
+    (52, 10, 9, 26, 4, NULL, 5.20, CURRENT_TIMESTAMP - INTERVAL '14 days', 'Seguimiento de carrera de cinco kilometros.'),
+    (53, 9, 9, 27, 5, 12, 20.00, CURRENT_TIMESTAMP - INTERVAL '1 day', 'Cierre de ciclo de kettlebell swing.'),
+    (54, 10, 9, 27, 4, NULL, 4.70, CURRENT_TIMESTAMP - INTERVAL '1 day', 'Cierre de ciclo de carrera de cinco kilometros.'),
+    -- Nicolas: squat and bench press progression.
+    (55, 1, 10, 28, 5, 5, 40.00, CURRENT_TIMESTAMP - INTERVAL '30 days', 'Test inicial de sentadilla.'),
+    (56, 2, 10, 28, 5, 5, 25.00, CURRENT_TIMESTAMP - INTERVAL '30 days', 'Test inicial de press de banca.'),
+    (57, 1, 10, 29, 5, 5, 47.50, CURRENT_TIMESTAMP - INTERVAL '14 days', 'Seguimiento de sentadilla.'),
+    (58, 2, 10, 29, 5, 5, 30.00, CURRENT_TIMESTAMP - INTERVAL '14 days', 'Seguimiento de press de banca.'),
+    (59, 1, 10, 30, 5, 5, 55.00, CURRENT_TIMESTAMP - INTERVAL '1 day', 'Cierre de ciclo de sentadilla.'),
+    (60, 2, 10, 30, 5, 5, 35.00, CURRENT_TIMESTAMP - INTERVAL '1 day', 'Cierre de ciclo de press de banca.');
+
+-- ============================================================
+-- ACTIVITIES AND GROUPS
+-- ============================================================
+
+INSERT INTO activities (gym_id, title, description, banner_url, participation_mode, status, is_visible, default_max_capacity)
+VALUES
+    (1, 'Boxeo funcional', 'Clases regulares de boxeo con grupos y cupos de prueba.', NULL, 'HYBRID', 'ACTIVE', TRUE, 15),
+    (1, 'Zumba al aire libre', 'Clase abierta de baile y acondicionamiento al aire libre.', NULL, 'OPEN', 'ACTIVE', TRUE, NULL),
+    (1, 'Preparacion competitiva', 'Entrenamiento tecnico para deportistas con ingreso por solicitud.', NULL, 'GROUP_ONLY', 'ACTIVE', TRUE, 12),
+    (1, 'Pilates controlado', 'Trabajo de movilidad, postura y fuerza en grupos reducidos.', NULL, 'HYBRID', 'ACTIVE', TRUE, 8),
+    (1, 'Cross training', 'Entrenamiento funcional de intensidad adaptable, con reserva puntual.', NULL, 'OPEN', 'ACTIVE', TRUE, 20);
+
+INSERT INTO activity_schedules (activity_id, day_of_week, starts_at, ends_at, max_capacity, active_from)
+VALUES
+    (1, 2, '17:00', '18:00', 15, CURRENT_DATE),
+    (1, 4, '17:00', '18:00', 15, CURRENT_DATE),
+    (2, 1, '19:00', '20:00', NULL, CURRENT_DATE),
+    (2, 3, '19:00', '20:00', NULL, CURRENT_DATE),
+    (3, 2, '07:00', '08:30', 12, CURRENT_DATE),
+    (3, 4, '07:00', '08:30', 12, CURRENT_DATE),
+    (4, 1, '09:00', '10:00', 8, CURRENT_DATE),
+    (4, 3, '09:00', '10:00', 8, CURRENT_DATE),
+    (5, 2, '18:30', '19:30', 20, CURRENT_DATE),
+    (5, 4, '18:30', '19:30', 20, CURRENT_DATE),
+    (5, 6, '10:00', '11:00', 20, CURRENT_DATE);
+
+INSERT INTO activity_schedule_instructors (schedule_id, gym_coach_id)
+VALUES
+    (1, 1), (2, 1),
+    (3, 1), (4, 1),
+    (5, 1), (6, 1),
+    (7, 1), (8, 1),
+    (9, 1), (10, 1), (11, 1);
+
+INSERT INTO activity_groups (activity_id, name, join_policy, status, max_members)
+VALUES
+    (1, 'Boxeo Mar-Jue 17 hs', 'OPEN', 'ACTIVE', 10),
+    (3, 'Competitivo Mar-Jue 7 hs', 'REQUEST_ONLY', 'ACTIVE', 12),
+    (4, 'Pilates Lun-Mie 9 hs', 'OPEN', 'ACTIVE', 8);
+
+INSERT INTO activity_group_schedules (group_id, schedule_id)
+VALUES
+    (1, 1), (1, 2),
+    (2, 5), (2, 6),
+    (3, 7), (3, 8);
+
+INSERT INTO activity_group_memberships (group_id, user_id, start_date)
+VALUES
+    (1, 1, CURRENT_DATE),
+    (3, 1, CURRENT_DATE);
+
+-- Sofia is also waiting for approval in the closed competitive group.
+INSERT INTO activity_group_join_requests (group_id, user_id, status)
+VALUES (2, 1, 'PENDING');
 
 -- Keep identity sequences ahead of the explicit test IDs.
 SELECT setval(pg_get_serial_sequence('user_roles', 'id'), COALESCE((SELECT MAX(id) FROM user_roles), 1), true);
+SELECT setval(pg_get_serial_sequence('system_roles', 'id'), COALESCE((SELECT MAX(id) FROM system_roles), 1), true);
+SELECT setval(pg_get_serial_sequence('user_system_roles', 'id'), COALESCE((SELECT MAX(id) FROM user_system_roles), 1), true);
+SELECT setval(pg_get_serial_sequence('coach_types', 'id'), COALESCE((SELECT MAX(id) FROM coach_types), 1), true);
 SELECT setval(pg_get_serial_sequence('users', 'id'), COALESCE((SELECT MAX(id) FROM users), 1), true);
+SELECT setval(pg_get_serial_sequence('countries', 'id'), COALESCE((SELECT MAX(id) FROM countries), 1), true);
+SELECT setval(pg_get_serial_sequence('provinces', 'id'), COALESCE((SELECT MAX(id) FROM provinces), 1), true);
+SELECT setval(pg_get_serial_sequence('localities', 'id'), COALESCE((SELECT MAX(id) FROM localities), 1), true);
 SELECT setval(pg_get_serial_sequence('gyms', 'id'), COALESCE((SELECT MAX(id) FROM gyms), 1), true);
+SELECT setval(pg_get_serial_sequence('gym_business_hours', 'id'), COALESCE((SELECT MAX(id) FROM gym_business_hours), 1), true);
+SELECT setval(pg_get_serial_sequence('gym_subscriptions', 'id'), COALESCE((SELECT MAX(id) FROM gym_subscriptions), 1), true);
 SELECT setval(pg_get_serial_sequence('user_gyms', 'id'), COALESCE((SELECT MAX(id) FROM user_gyms), 1), true);
+SELECT setval(pg_get_serial_sequence('gym_coaches', 'id'), COALESCE((SELECT MAX(id) FROM gym_coaches), 1), true);
 SELECT setval(pg_get_serial_sequence('news', 'id'), COALESCE((SELECT MAX(id) FROM news), 1), true);
 SELECT setval(pg_get_serial_sequence('exercises', 'id'), COALESCE((SELECT MAX(id) FROM exercises), 1), true);
 SELECT setval(pg_get_serial_sequence('quantity_types', 'id'), COALESCE((SELECT MAX(id) FROM quantity_types), 1), true);
@@ -252,7 +543,17 @@ SELECT setval(pg_get_serial_sequence('days', 'id'), COALESCE((SELECT MAX(id) FRO
 SELECT setval(pg_get_serial_sequence('blocks', 'id'), COALESCE((SELECT MAX(id) FROM blocks), 1), true);
 SELECT setval(pg_get_serial_sequence('block_exercises', 'id'), COALESCE((SELECT MAX(id) FROM block_exercises), 1), true);
 SELECT setval(pg_get_serial_sequence('current_plan_activities', 'id'), COALESCE((SELECT MAX(id) FROM current_plan_activities), 1), true);
+SELECT setval(pg_get_serial_sequence('plan_executions', 'id'), COALESCE((SELECT MAX(id) FROM plan_executions), 1), true);
+SELECT setval(pg_get_serial_sequence('plan_execution_items', 'id'), COALESCE((SELECT MAX(id) FROM plan_execution_items), 1), true);
 SELECT setval(pg_get_serial_sequence('registers', 'id'), COALESCE((SELECT MAX(id) FROM registers), 1), true);
+SELECT setval(pg_get_serial_sequence('evaluations', 'id'), COALESCE((SELECT MAX(id) FROM evaluations), 1), true);
 SELECT setval(pg_get_serial_sequence('user_tests', 'id'), COALESCE((SELECT MAX(id) FROM user_tests), 1), true);
+SELECT setval(pg_get_serial_sequence('activities', 'id'), COALESCE((SELECT MAX(id) FROM activities), 1), true);
+SELECT setval(pg_get_serial_sequence('activity_schedules', 'id'), COALESCE((SELECT MAX(id) FROM activity_schedules), 1), true);
+SELECT setval(pg_get_serial_sequence('activity_schedule_instructors', 'id'), COALESCE((SELECT MAX(id) FROM activity_schedule_instructors), 1), true);
+SELECT setval(pg_get_serial_sequence('activity_groups', 'id'), COALESCE((SELECT MAX(id) FROM activity_groups), 1), true);
+SELECT setval(pg_get_serial_sequence('activity_group_schedules', 'id'), COALESCE((SELECT MAX(id) FROM activity_group_schedules), 1), true);
+SELECT setval(pg_get_serial_sequence('activity_group_memberships', 'id'), COALESCE((SELECT MAX(id) FROM activity_group_memberships), 1), true);
+SELECT setval(pg_get_serial_sequence('activity_group_join_requests', 'id'), COALESCE((SELECT MAX(id) FROM activity_group_join_requests), 1), true);
 
 COMMIT;

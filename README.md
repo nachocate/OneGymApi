@@ -54,6 +54,98 @@ Then start the server:
 ./gradlew.bat run
 ```
 
+## Local image storage
+
+Images uploaded through `POST /gyms/{gymId}/uploads/images` are optimized and
+stored outside PostgreSQL in the local `uploads/` folder. PostgreSQL stores only
+the returned URL under `/media/...`. This folder is intentionally ignored by
+Git. Development settings for the directory, maximum size, dimensions and JPEG
+quality are in the `media` section of `application.conf`; keep those settings
+aligned across development machines when sharing local files is required.
+
 The `users` table is created automatically on the first user request.
 Environment variables named `DB_URL`, `DB_USER`, `DB_PASSWORD` and `DB_POOL_SIZE`
 can be used later and take priority over `application.conf`.
+
+## Authentication
+
+## Resource identifiers
+
+Every persisted resource uses a database-generated, auto-incrementing `Long` ID.
+For every `POST` endpoint, omit `id` from the JSON body; the database assigns it.
+The generated ID is returned by subsequent resource reads. IDs in request bodies are
+ignored by the create repositories and must never be chosen by clients.
+
+For example, create a user with:
+
+```json
+{
+  "email": "nachocate@gmail.com",
+  "password": "nachocate@gmail.com",
+  "firstName": "Ignacio",
+  "lastName": "Catena",
+  "avatarUrl": null,
+  "phone": null,
+  "address": null
+}
+```
+
+All resource routes require `Authorization: Bearer <accessToken>`. Local JWT
+settings are in `src/main/resources/application.conf`. For production, override
+the values with these environment variables (use independent random values of
+at least 32 characters):
+
+```powershell
+$env:JWT_SECRET = "replace-with-a-long-random-secret"
+$env:JWT_REFRESH_TOKEN_HASH_SECRET = "replace-with-a-second-long-random-secret"
+```
+
+`POST /login` accepts the former login body plus optional `deviceInfo` and returns
+the user, a 15-minute access token, and a 30-day refresh token. Use
+`POST /auth/refresh` with `{ "refreshToken": "..." }` to rotate both tokens,
+and `POST /auth/logout` with the refresh token to revoke that session. The TTLs
+can be changed through `JWT_ACCESS_TOKEN_TTL_MINUTES` and
+`JWT_REFRESH_TOKEN_TTL_DAYS`.
+
+`GET /status` requires the access token and returns the current user's active
+gym subscriptions, the role held in each gym, its basic details, and `gymCount`.
+
+`GET /{gymId}/news` requires an active subscription to that gym and returns its
+news ordered from newest to oldest.
+
+`GET /{gymId}/home` requires an active subscription and returns the gym plus
+its active coaches. Coaches are assigned through `gym_coaches`, independently
+from the user's membership role, and include their `coachType` and assignment
+dates.
+
+`GET /plan/{gymId}/me` requires an active subscription and returns every active
+plan for the authenticated user in that gym. Plans include their weeks, days,
+blocks, block exercises, quantity types, and active week/day markers.
+
+For an existing database, run
+`src/main/resources/migrations/V2__create_user_refresh_tokens.sql` once before
+deploying. The API does not currently include a migration runner.
+
+Then run `migrations/V4__add_user_contact_and_gym_coaches.sql` to add the
+`phone` and `address` user fields plus the `coach_types` and `gym_coaches`
+tables. Fresh databases receive these definitions directly from
+`onegym_schema.sql`.
+
+Run `migrations/V5__add_news_image_url.sql` to add the optional `image_url`
+field to existing news without changing any current records.
+
+Run `migrations/V6__add_current_plan_activity_is_active.sql` to add the
+`is_active` planning flag to existing current-plan activities. Existing rows
+and new rows default to `false`.
+
+## Resetting a local database
+
+`src/main/resources/reset_onegym_schema.sql` permanently removes only the
+OneGym tables and their data. Run it manually against the intended local
+database, then execute `onegym_schema.sql` to recreate the schema and seed
+quantity types.
+
+The test users in `seed_test_data.sql` use `password` as their password. If
+you seeded the database before the BCrypt correction, run
+`migrations/V3__fix_seeded_test_user_passwords.sql` once to update only the
+four `@onegym.test` users.

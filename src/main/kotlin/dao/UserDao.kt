@@ -8,8 +8,11 @@ import org.jetbrains.exposed.v1.dao.LongEntityClass
 object Users : LongIdTable("users") {
     val firstName = varchar("firstname", 100)
     val lastName = varchar("lastname", 100)
-    val email = varchar("email", 255).uniqueIndex()
+    val email = varchar("email", 255)
     val password = varchar("password", 255)
+    val avatarUrl = text("avatar_url").nullable()
+    val phone = varchar("phone", 50).nullable()
+    val address = varchar("address", 255).nullable()
 }
 
 class UserDao(id: EntityID<Long>) : LongEntity(id) {
@@ -19,4 +22,7 @@ class UserDao(id: EntityID<Long>) : LongEntity(id) {
     var lastName by Users.lastName
     var email by Users.email
     var password by Users.password
+    var avatarUrl by Users.avatarUrl
+    var phone by Users.phone
+    var address by Users.address
 }

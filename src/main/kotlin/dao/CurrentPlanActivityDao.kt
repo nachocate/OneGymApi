@@ -12,4 +12,5 @@ class CurrentPlanActivityDao(id: EntityID<Long>) : LongEntity(id) {
     var userPlanId by CurrentPlanActivities.userPlan
     var activeWeekId by CurrentPlanActivities.activeWeek
     var activeDayId by CurrentPlanActivities.activeDay
+    var isActive by CurrentPlanActivities.isActive
 }

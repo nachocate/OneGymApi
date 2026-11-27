@@ -2,19 +2,42 @@ package com.concatstudio.onegym.modules
 
 import com.concatstudio.onegym.data.*
 import com.concatstudio.onegym.respository.*
+import com.concatstudio.onegym.security.JwtService
+import com.concatstudio.onegym.security.JwtSettings
+import com.concatstudio.onegym.security.AuthorizationService
+import com.concatstudio.onegym.media.LocalImageStorage
+import com.concatstudio.onegym.media.MediaStorageSettings
 import org.koin.dsl.module
 
 val appDiModules = module {
+    single { JwtSettings.load() }
+    single { JwtService(get()) }
+    single<RefreshTokenRepository> { RefreshTokenRepositoryImp() }
+    single<UserStatusRepository> { UserStatusRepositoryImp() }
+    single<GymHomeRepository> { GymHomeRepositoryImp() }
+    single<CoachTypeRepository> { CoachTypeRepositoryImp() }
+    single<GymCoachRepository> { GymCoachRepositoryImp() }
+    single<ActivePlanRepository> { ActivePlanRepositoryImp() }
     single<UserRepository> { UserRepositoryImp() }
     single<GymRepository> { GymRepositoryImp() }
+    single { GymManagementService() }
+    single { GymCoachManagementService() }
+    single { AuthorizationService() }
+    single { MediaStorageSettings.load() }
+    single { LocalImageStorage(get()) }
+    single<GymBusinessHourRepository> { GymBusinessHourRepositoryImp() }
     single<UserRoleRepository> { UserRoleRepositoryImp() }
     single<UserGymRepository> { UserGymRepositoryImp() }
     single<NewsRepository> { NewsRepositoryImp() }
     single<PlanTypeRepository> { PlanTypeRepositoryImp() }
     single<PlanRepository> { PlanRepositoryImp() }
+    single<PlanificationRepository> { PlanificationRepositoryImp() }
+    single<PlanExecutionRepository> { PlanExecutionRepositoryImp() }
+    single<ActivityRepository> { ActivityRepositoryImp() }
     single<WeekRepository> { WeekRepositoryImp() }
     single<DayRepository> { DayRepositoryImp() }
     single<ExerciseRepository> { ExerciseRepositoryImp() }
+    single<EvaluationRepository> { EvaluationRepositoryImp() }
     single<QuantityTypeRepository> { QuantityTypeRepositoryImp() }
     single<BlockRepository> { BlockRepositoryImp() }
     single<BlockExerciseRepository> { BlockExerciseRepositoryImp() }
