@@ -1,0 +1,12 @@
+.git
+.gradle
+.kotlin
+.idea
+build
+out
+uploads
+**/.env
+**/.env.*
+**/application.local.conf
+**/*.jks
+**/*.keystore

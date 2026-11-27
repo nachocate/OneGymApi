@@ -34,6 +34,10 @@ If the server starts successfully, you'll see the following output:
 2024-12-04 14:32:45.682 [main] INFO  Application - Responding at http://0.0.0.0:8080
 ```
 
+## Despliegue en Coolify
+
+El repositorio incluye un `Dockerfile` con Java 21. Para configurar la aplicación, PostgreSQL y el volumen de imágenes, seguir la [guía de despliegue en Coolify](docs/deploy-coolify.md).
+
 ## PostgreSQL
 
 The API uses the existing PostgreSQL database `onegym_db`. Configure the

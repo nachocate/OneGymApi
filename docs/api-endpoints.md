@@ -5,7 +5,7 @@ Guía de integración para frontend basada en las rutas actualmente declaradas e
 ## Convenciones generales
 
 - Reemplazar `{BASE_URL}` por la URL del ambiente, por ejemplo `http://localhost:8080`.
-- Salvo las rutas de autenticación, `/` y `/json/kotlinx-serialization`, todos los endpoints requieren:
+- Salvo las rutas de autenticación, `/`, `/health/ready`, `/json/kotlinx-serialization` y los archivos públicos de `/media`, los endpoints requieren:
 
   ```http
   Authorization: Bearer <accessToken>
@@ -21,7 +21,7 @@ Guía de integración para frontend basada en las rutas actualmente declaradas e
 - Los `PUT` son actualizaciones completas: enviar todos los campos requeridos del objeto. El `id` del body se ignora; prevalece el ID de la URL.
 - Las fechas `date` usan ISO-8601 con zona horaria, por ejemplo `2026-10-09T12:00:00Z`. Las fechas de membresías y entrenadores usan `YYYY-MM-DD`.
 
-> Nota de CORS: la configuración actual permite como origen explícito `http://localhost:5173`. Otros orígenes requerirán una actualización de la configuración del backend.
+> CORS permite `http://localhost:5173` en desarrollo. En Coolify, `CORS_ALLOWED_ORIGIN` define el origen exacto del dashboard. Si se omite, el perfil de Coolify no permite peticiones de navegador desde otros orígenes.
 
 El origen configurado puede realizar `GET`, `POST`, `PUT`, `DELETE` y el preflight `OPTIONS` con los headers `Authorization` y `Content-Type`.
 
@@ -29,7 +29,7 @@ El origen configurado puede realizar `GET`, `POST`, `PUT`, `DELETE` y el preflig
 
 | Área | Endpoints |
 | --- | --- |
-| Públicos | `GET /`, `GET /json/kotlinx-serialization` |
+| Públicos | `GET /`, [`GET /health/ready`](endpoints/health/health-endpoints.md), `GET /json/kotlinx-serialization` |
 | Autenticación | `POST /login`, `POST /auth/refresh`, `POST /auth/logout` |
 | Sesión del usuario | `GET /profile/me`, `GET /status` |
 | Información del gimnasio | `GET /{gymId}/home`, `GET /{gymId}/news`, `GET /plan/{gymId}/me` |

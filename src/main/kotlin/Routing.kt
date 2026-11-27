@@ -19,6 +19,7 @@ fun Application.configureRouting() {
         get("/json/kotlinx-serialization") {
             call.respond(mapOf("hello" to "world"))
         }
+        healthRouting()
         authenticationRouting()
         staticFiles(mediaSettings.publicPath, mediaSettings.rootDirectory.toFile())
         authenticate("auth-jwt") {

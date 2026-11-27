@@ -1,5 +1,6 @@
 # Gradle / Kotlin build output
 .gradle/
+.kotlin/
 build/
 out/
 *.class
